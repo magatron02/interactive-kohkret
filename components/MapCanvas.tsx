@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CONTEXT_ROADS,
   ISLAND_PATH,
@@ -27,17 +27,57 @@ const { width: VW, height: VH } = MAP_VIEWBOX;
 const FRAME_WIDE = { x: 0, y: 0, w: VW, h: VH };
 const FRAME_TALL = { x: VW / 2 - 62.5, y: 0, w: 125, h: VH };
 
-function useFrame() {
-  // Server and first client render agree on the wide frame; narrow screens swap after mount.
+const MAX_ZOOM = 6;
+
+/** The width below which the wide letterbox renders too short to be a usable map. */
+const NARROW_PX = 640;
+
+/**
+ * Which crop to show, decided by the map's own rendered width rather than by a viewport media query.
+ * The container is the thing that actually determines whether the letterbox is usable, and observing
+ * it directly also survives resizes that never deliver a matchMedia `change` event.
+ *
+ * Server and first client render agree on the wide frame; the observer corrects it on mount.
+ */
+function useBaseFrame(ref: React.RefObject<HTMLElement | null>) {
   const [narrow, setNarrow] = useState(false);
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
-    const sync = () => setNarrow(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => setNarrow(el.getBoundingClientRect().width < NARROW_PX);
+    measure();
+    // ResizeObserver is the right instrument here — it catches the container changing for any reason,
+    // including a sidebar opening, not just the window moving. `resize` is kept as a belt-and-braces
+    // fallback for environments that deliver one but not the other.
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [ref]);
   return narrow ? FRAME_TALL : FRAME_WIDE;
+}
+
+type Frame = { x: number; y: number; w: number; h: number };
+
+/**
+ * Zoom by narrowing the viewBox rather than by CSS transform. Pin positions are already computed as
+ * fractions of the live frame, so they follow the geometry exactly and stay pinned to their
+ * coordinates at every zoom level — while keeping their own size, which a transform would scale.
+ *
+ * The frame is clamped to the base view, so the island can never be panned off into empty space.
+ */
+function clampFrame(base: Frame, f: Frame): Frame {
+  const w = Math.min(base.w, Math.max(base.w / MAX_ZOOM, f.w));
+  const h = w * (base.h / base.w);
+  return {
+    w,
+    h,
+    x: Math.min(base.x + base.w - w, Math.max(base.x, f.x)),
+    y: Math.min(base.y + base.h - h, Math.max(base.y, f.y)),
+  };
 }
 
 export default function MapCanvas({
@@ -54,29 +94,100 @@ export default function MapCanvas({
   onSelectPlace: (id: string) => void;
   hasSelection: boolean;
 }) {
-  const frame = useFrame();
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const base = useBaseFrame(wrapRef);
+  const [frame, setFrame] = useState<Frame>(base);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const drag = useRef<{ px: number; py: number; fx: number; fy: number } | null>(null);
+
+  // A breakpoint change re-frames the map, which resets any zoom — the tall crop is a different view.
+  useEffect(() => setFrame(base), [base]);
+
+  const zoomed = frame.w < base.w - 0.001;
+
+  /** Zoom about a focal point given in 0..1 of the current frame, so the spot under the cursor stays put. */
+  const zoomBy = useCallback(
+    (factor: number, fx = 0.5, fy = 0.5) => {
+      setFrame((prev) => {
+        const w = prev.w / factor;
+        const next = clampFrame(base, {
+          w,
+          h: w * (base.h / base.w),
+          x: prev.x + (prev.w - w) * fx,
+          y: prev.y + (prev.h - w * (base.h / base.w)) * fy,
+        });
+        return next;
+      });
+    },
+    [base]
+  );
+
+  function onWheel(e: React.WheelEvent<SVGSVGElement>) {
+    if (!svgRef.current) return;
+    e.preventDefault();
+    const r = svgRef.current.getBoundingClientRect();
+    zoomBy(e.deltaY < 0 ? 1.2 : 1 / 1.2, (e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+  }
+
+  function onPointerDown(e: React.PointerEvent<SVGSVGElement>) {
+    if (!zoomed) return;
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+    drag.current = { px: e.clientX, py: e.clientY, fx: frame.x, fy: frame.y };
+  }
+
+  function onPointerMove(e: React.PointerEvent<SVGSVGElement>) {
+    const d = drag.current;
+    if (!d || !svgRef.current) return;
+    const r = svgRef.current.getBoundingClientRect();
+    setFrame((prev) =>
+      clampFrame(base, {
+        ...prev,
+        x: d.fx - ((e.clientX - d.px) / r.width) * prev.w,
+        y: d.fy - ((e.clientY - d.py) / r.height) * prev.h,
+      })
+    );
+  }
+
+  const endDrag = () => {
+    drag.current = null;
+  };
+
   const routePlaces = activeRoute
     ? activeRoute.stops.map((s) => getPlace(s.placeId)).filter((p): p is Place => Boolean(p))
     : [];
   const routeLine = activeRoute ? ROUTE_GEOMETRY[activeRoute.id]?.d : undefined;
   const routeStopIds = new Set(routePlaces.map((p) => p.id));
 
-  // A highlighted route shows its own stops and nothing else. Keeping the rest on screen — even
-  // dimmed — put unrelated markers in among the numbers and made the sequence hard to follow.
+  // A highlighted route shows its own numbered stops. Anything else on screen has to be asked for:
+  // `visiblePlaces` is empty until a category or a search narrows it, so the two can be combined
+  // without the clutter that showing everything-dimmed produced.
   const routeUnique = routePlaces.filter((p, i, all) => all.findIndex((q) => q.id === p.id) === i);
-  const shown = activeRoute ? routeUnique : visiblePlaces;
+  const shown = activeRoute
+    ? [...routeUnique, ...visiblePlaces.filter((p) => !routeStopIds.has(p.id))]
+    : visiblePlaces;
 
   return (
     <div
+      ref={wrapRef}
       className={`relative w-full overflow-hidden rounded-2xl bg-[var(--color-bg-map)] ring-1 ring-[var(--color-hairline)] ${
         activeRoute ? "map-has-route" : ""
       }`}
     >
       <svg
+        ref={svgRef}
         viewBox={`${frame.x} ${frame.y} ${frame.w} ${frame.h}`}
-        className="block h-auto w-full"
+        className={`block h-auto w-full touch-none ${zoomed ? "cursor-grab active:cursor-grabbing" : ""}`}
         role="img"
         aria-label="แผนที่เกาะเกร็ดและพื้นที่โดยรอบ แสดงแม่น้ำเจ้าพระยา ชายฝั่งจริง และโครงข่ายถนนจริงจาก OpenStreetMap"
+        onWheel={onWheel}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onDoubleClick={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          zoomBy(1.8, (e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+        }}
       >
         <defs>
           <clipPath id="island-clip">
@@ -132,6 +243,25 @@ export default function MapCanvas({
       <div className="pointer-events-none absolute right-3 top-3 flex flex-col items-center gap-0.5 text-[var(--color-ink)] sm:right-5 sm:top-5">
         <Icon name="compass" className="h-8 w-8 sm:h-10 sm:w-10" strokeWidth={1.2} />
         <span className="text-[10px] font-semibold tracking-[0.18em]">N</span>
+      </div>
+
+      {/* Wheel and drag cover pointer users; these give the same reach by keyboard and on touch. */}
+      <div className="absolute bottom-3 right-3 flex flex-col gap-1.5 sm:bottom-4 sm:right-5">
+        <button type="button" onClick={() => zoomBy(1.6)} aria-label="ขยายแผนที่" className="map-zoom-btn">
+          +
+        </button>
+        <button type="button" onClick={() => zoomBy(1 / 1.6)} aria-label="ย่อแผนที่" className="map-zoom-btn">
+          −
+        </button>
+        <button
+          type="button"
+          onClick={() => setFrame(base)}
+          aria-label="กลับไปมุมมองเต็มเกาะ"
+          disabled={!zoomed}
+          className="map-zoom-btn text-[10px] disabled:opacity-35"
+        >
+          ⤢
+        </button>
       </div>
 
       {shown.length === 0 && (

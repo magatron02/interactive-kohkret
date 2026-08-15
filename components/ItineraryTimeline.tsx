@@ -42,7 +42,7 @@ export default function ItineraryTimeline({
         )}
       </div>
 
-      <ol className="edge-fade -mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:px-0">
+      <ol className="scroll-x -mx-4 mt-2 flex gap-2 px-4 pb-2 lg:mx-0 lg:px-0">
         {route.stops.map((stop, i) => {
           const place = getPlace(stop.placeId);
           if (!place) return null;

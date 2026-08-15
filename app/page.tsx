@@ -61,11 +61,15 @@ export default function Home() {
 
   // "Show me the island" is the resting state. Pins appear once the visitor asks for something —
   // a category, a search, or a route — so an unfiltered map is a map, not nineteen markers.
-  const hasSelection = activeCategories.size > 0 || searchQuery.trim().length > 0 || activeRoute !== null;
-  const pinnedPlaces = hasSelection ? visiblePlaces : [];
+  //
+  // A route does NOT count as a category filter here: with a route open you can still switch a
+  // category on and see those places alongside the numbered stops, without clearing the route first.
+  const narrowedByFilter = activeCategories.size > 0 || searchQuery.trim().length > 0;
+  const hasSelection = narrowedByFilter || activeRoute !== null;
+  const pinnedPlaces = narrowedByFilter ? visiblePlaces : [];
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[1400px] flex-col px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
+    <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-[1400px] flex-col px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
       <header className="mb-4 lg:mb-5">
         <BrandLockup />
       </header>

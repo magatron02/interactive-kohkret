@@ -86,6 +86,44 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
+/*
+  Kiln-lid backdrop: the incised Mon earthenware the island is known for, as a whisper behind the page.
+  It is a fixed layer under everything, faded top-to-bottom so the header stays clean and the pattern
+  only reads down where the page is otherwise empty. Two things keep it from competing:
+  the mask, and an opacity low enough that it never approaches the contrast of any real content.
+  It is decoration with no meaning, so it is aria-hidden and skipped entirely under reduced motion
+  contexts that also ask for reduced transparency.
+*/
+.page-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url("/pattern-kiln-lids.webp");
+  background-size: cover;
+  background-position: center 30%;
+  opacity: 0.16;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.35) 22%,
+    rgb(0 0 0 / 0.9) 60%,
+    rgb(0 0 0 / 0.55) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.35) 22%,
+    rgb(0 0 0 / 0.9) 60%,
+    rgb(0 0 0 / 0.55) 100%
+  );
+  pointer-events: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .page-backdrop {
+    display: none;
+  }
+}
+
 /* ----------------------------------------------------------------- page grid
 
   Source order is the mobile order, and it is the order that matters: search, then filters, then the map,
@@ -102,6 +140,9 @@ body {
     grid-template-columns: minmax(0, 1fr) 320px;
     gap: 2rem;
     align-items: start;
+    /* The right column is its own track pair sized only by its own content. Letting the map column
+       share the rows meant opening an itinerary grew row 1 and pushed the QR card down with it. */
+    grid-template-rows: auto 1fr;
   }
   .app-grid > .region-main {
     grid-column: 1;
@@ -110,15 +151,17 @@ body {
   .app-grid > .region-filters {
     grid-column: 2;
     grid-row: 1;
+    align-self: start;
   }
   .app-grid > .region-extra {
     grid-column: 2;
     grid-row: 2;
+    align-self: start;
   }
 }
 
-/* Horizontal scrollers (category chips, route chips, itinerary) fade at the trailing edge so a cut-off
-   item reads as "there is more" without spending room on an arrow button. */
+/* Horizontal scrollers (category chips, route chips) fade at the trailing edge so a cut-off item
+   reads as "there is more" without spending room on an arrow button. */
 .edge-fade {
   scrollbar-width: none;
 }
@@ -130,6 +173,36 @@ body {
     -webkit-mask-image: linear-gradient(to right, #000 88%, transparent);
     mask-image: linear-gradient(to right, #000 88%, transparent);
   }
+}
+
+/*
+  The itinerary is the one scroller that keeps a real scrollbar. A ten-stop day runs well past the
+  edge, and hiding the bar left no way to tell there was more day to read — or to drag through it
+  with a trackpad-less mouse. Styled slim so it reads as part of the strip.
+*/
+.scroll-x {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-faint) transparent;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+}
+.scroll-x > * {
+  scroll-snap-align: start;
+}
+.scroll-x::-webkit-scrollbar {
+  height: 8px;
+}
+.scroll-x::-webkit-scrollbar-track {
+  background: var(--color-bg-map);
+  border-radius: 9999px;
+}
+.scroll-x::-webkit-scrollbar-thumb {
+  background: var(--color-hairline);
+  border-radius: 9999px;
+}
+.scroll-x::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-faint);
 }
 
 /* ---------------------------------------------------------------- map layers */
@@ -269,6 +342,39 @@ body {
   border-radius: 9999px 9999px 9999px 9999px;
   box-shadow: 0 2px 5px rgb(0 0 0 / 0.55);
 }
+.map-zoom-btn {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid var(--color-hairline);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--color-bg-panel) 88%, transparent);
+  color: var(--color-ink);
+  font-size: 1rem;
+  line-height: 1;
+  transition:
+    background-color 150ms var(--ease-out-expo),
+    border-color 150ms var(--ease-out-expo);
+}
+.map-zoom-btn:hover:not(:disabled) {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-ink-faint);
+}
+.map-zoom-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+/* The visible control stays small on the map; the hit area still clears 44px for a thumb. */
+.map-zoom-btn::before {
+  content: "";
+  position: absolute;
+  inset: -0.375rem;
+}
+.map-zoom-btn {
+  position: relative;
+}
+
 .map-pin__count {
   position: absolute;
   top: -0.3rem;

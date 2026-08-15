@@ -18,7 +18,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="th">
-      <body className={notoSansThai.className}>{children}</body>
+      <body className={notoSansThai.className}>
+        {/* Decorative only — the incised kiln lids Koh Kret is known for, faded behind the page. */}
+        <div className="page-backdrop" aria-hidden="true" />
+        {children}
+      </body>
     </html>
   );
 }
