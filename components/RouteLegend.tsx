@@ -10,22 +10,26 @@ export default function RouteLegend({
 }) {
   return (
     <section aria-labelledby="routes-heading">
-      <div className="flex items-baseline justify-between gap-3">
+      {/* Same reservation as the category panel: the button occupies its space whether or not it is
+          shown, so choosing a route does not nudge the map and the legend under it. */}
+      <div className="flex min-h-9 items-center justify-between gap-3">
         <h2
           id="routes-heading"
           className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]"
         >
           Highlight Routes
         </h2>
-        {activeRouteId && (
-          <button
-            type="button"
-            onClick={() => onSelect(null)}
-            className="-mr-2 inline-flex min-h-11 items-center rounded px-2 text-xs text-[var(--color-ink-muted)] underline-offset-2 transition-colors duration-150 hover:text-[var(--color-ink)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-deep)]"
-          >
-            ล้างเส้นทาง
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => onSelect(null)}
+          aria-hidden={!activeRouteId}
+          tabIndex={activeRouteId ? undefined : -1}
+          className={`-mr-2 inline-flex min-h-9 items-center rounded px-2 text-xs text-[var(--color-ink-muted)] underline-offset-2 transition-colors duration-150 hover:text-[var(--color-ink)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-deep)] ${
+            activeRouteId ? "" : "pointer-events-none invisible"
+          }`}
+        >
+          ล้างเส้นทาง
+        </button>
       </div>
 
       {/* Phone: one scrollable row so the six routes never push the itinerary below the fold.

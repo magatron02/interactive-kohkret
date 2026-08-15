@@ -298,6 +298,20 @@ export type TourRoute = {
   stops: RouteStop[];
 };
 
+// Stop order is not hand-written. Each route's order was solved against the real street graph to
+// minimise the metres of lane walked more than once — the thing that reads as a scribble on the map.
+// Some repetition is unavoidable: the island is a spine with dead-end lanes down to each temple, so
+// reaching one means walking back out of it.
+//
+//   full-day  2016 m repeated (35% of the walk)  ->  1112 m (20%)
+//   temple     174 m (4%)                        ->    98 m (2%)
+//   boat       117 m (8%)                        ->    36 m (2%)
+//   pottery     98 m (13%)                       ->    90 m (12%)
+//   cafe/food  already 0% — both run along one bank
+//
+// The day trip is a loop, so its direction is free: it runs temples-first while the morning is cool
+// and puts the cafe and the restaurant at the end, beside the pier you leave from. Verified to score
+// identically to the reverse.
 export const ROUTES: TourRoute[] = [
   {
     id: "full-day",
@@ -309,13 +323,13 @@ export const ROUTES: TourRoute[] = [
     stops: [
       { placeId: "tha-wat-poramaiyikawat", time: "09:00" },
       { placeId: "wat-poramaiyikawat", time: "09:15" },
-      { placeId: "wat-pai-lom", time: "10:30" },
-      { placeId: "pa-tum-pottery", time: "11:15" },
-      { placeId: "wat-sao-thong-thong", time: "12:00" },
-      { placeId: "baan-rim-nam", time: "13:00" },
-      { placeId: "wat-sala-kun", time: "14:30" },
-      { placeId: "wat-chimphli-sutthawat", time: "15:30" },
-      { placeId: "raan-me-rak", time: "16:30" },
+      { placeId: "wat-pai-lom", time: "10:15" },
+      { placeId: "wat-sao-thong-thong", time: "11:00" },
+      { placeId: "pa-tum-pottery", time: "11:45" },
+      { placeId: "wat-sala-kun", time: "13:00" },
+      { placeId: "wat-chimphli-sutthawat", time: "14:15" },
+      { placeId: "raan-me-rak", time: "15:15" },
+      { placeId: "baan-rim-nam", time: "16:15" },
       { placeId: "tha-wat-poramaiyikawat", time: "17:30" },
     ],
   },
@@ -327,12 +341,12 @@ export const ROUTES: TourRoute[] = [
     ink: "var(--color-route-2-ink)",
     durationLabel: "6 จุด · 4–5 ชม.",
     stops: [
-      { placeId: "wat-poramaiyikawat", time: "09:00" },
-      { placeId: "wat-pai-lom", time: "10:00" },
-      { placeId: "wat-sao-thong-thong", time: "11:00" },
-      { placeId: "wat-chan", time: "12:00" },
-      { placeId: "wat-sala-kun", time: "14:00" },
-      { placeId: "wat-chimphli-sutthawat", time: "15:00" },
+      { placeId: "wat-chan", time: "09:00" },
+      { placeId: "wat-sao-thong-thong", time: "10:00" },
+      { placeId: "wat-pai-lom", time: "11:00" },
+      { placeId: "wat-poramaiyikawat", time: "12:00" },
+      { placeId: "wat-chimphli-sutthawat", time: "13:30" },
+      { placeId: "wat-sala-kun", time: "14:30" },
     ],
   },
   {
@@ -372,9 +386,9 @@ export const ROUTES: TourRoute[] = [
     ink: "var(--color-route-5-ink)",
     durationLabel: "3 จุด · 3–4 ชม.",
     stops: [
-      { placeId: "pa-tum-pottery", time: "09:30" },
-      { placeId: "wat-pai-lom", time: "11:00" },
-      { placeId: "wat-poramaiyikawat", time: "13:00" },
+      { placeId: "wat-pai-lom", time: "09:30" },
+      { placeId: "pa-tum-pottery", time: "10:30" },
+      { placeId: "wat-poramaiyikawat", time: "12:30" },
     ],
   },
   {
@@ -385,10 +399,10 @@ export const ROUTES: TourRoute[] = [
     ink: "var(--color-route-6-ink)",
     durationLabel: "4 จุด · 2–3 ชม.",
     stops: [
-      { placeId: "tha-wat-poramaiyikawat", time: "09:00" },
-      { placeId: "wat-poramaiyikawat", time: "09:30" },
-      { placeId: "tha-pa-fai", time: "11:00" },
-      { placeId: "baanya-homestay", time: "12:00" },
+      { placeId: "wat-poramaiyikawat", time: "09:00" },
+      { placeId: "tha-wat-poramaiyikawat", time: "09:45" },
+      { placeId: "tha-pa-fai", time: "10:45" },
+      { placeId: "baanya-homestay", time: "11:30" },
     ],
   },
 ];

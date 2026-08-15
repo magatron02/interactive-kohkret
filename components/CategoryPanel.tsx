@@ -12,22 +12,26 @@ export default function CategoryPanel({
 }) {
   return (
     <section aria-labelledby="categories-heading">
-      <div className="flex items-baseline justify-between gap-3">
+      {/* The clear button is always in the layout and only its visibility changes. Mounting it on
+          selection shifted this whole column down by its own height every time a chip was tapped. */}
+      <div className="flex min-h-9 items-center justify-between gap-3">
         <h2
           id="categories-heading"
           className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]"
         >
           Categories
         </h2>
-        {active.size > 0 && (
-          <button
-            type="button"
-            onClick={onClear}
-            className="-mr-2 inline-flex min-h-11 items-center rounded px-2 text-xs text-[var(--color-ink-muted)] underline-offset-2 transition-colors duration-150 hover:text-[var(--color-ink)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-panel)]"
-          >
-            แสดงทั้งหมด
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={onClear}
+          aria-hidden={active.size === 0}
+          tabIndex={active.size === 0 ? -1 : undefined}
+          className={`-mr-2 inline-flex min-h-9 items-center rounded px-2 text-xs text-[var(--color-ink-muted)] underline-offset-2 transition-colors duration-150 hover:text-[var(--color-ink)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-panel)] ${
+            active.size === 0 ? "pointer-events-none invisible" : ""
+          }`}
+        >
+          แสดงทั้งหมด
+        </button>
       </div>
 
       {/* Phone: a horizontal chip rail, because six full-width rows would push the map off screen.

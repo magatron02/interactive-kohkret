@@ -61,10 +61,10 @@ export default function MapCanvas({
   const routeLine = activeRoute ? ROUTE_GEOMETRY[activeRoute.id]?.d : undefined;
   const routeStopIds = new Set(routePlaces.map((p) => p.id));
 
+  // A highlighted route shows its own stops and nothing else. Keeping the rest on screen — even
+  // dimmed — put unrelated markers in among the numbers and made the sequence hard to follow.
   const routeUnique = routePlaces.filter((p, i, all) => all.findIndex((q) => q.id === p.id) === i);
-  const shown = activeRoute
-    ? [...routeUnique, ...visiblePlaces.filter((p) => !routeStopIds.has(p.id))]
-    : visiblePlaces;
+  const shown = activeRoute ? routeUnique : visiblePlaces;
 
   return (
     <div
