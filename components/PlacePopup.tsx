@@ -46,11 +46,36 @@ export default function PlacePopup({
         </p>
       )}
 
+      {place.cuisine && (
+        <ul className="mt-2 flex flex-wrap gap-1.5">
+          {place.cuisine.map((c) => (
+            <li
+              key={c}
+              className="rounded border border-[var(--color-hairline)] px-1.5 py-0.5 text-[11px] text-[var(--color-ink-muted)]"
+            >
+              {c}
+            </li>
+          ))}
+        </ul>
+      )}
+
       <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-[var(--color-hairline)] pt-2.5 text-[11px]">
         <div className="flex gap-1.5">
           <dt className="text-[var(--color-ink-faint)]">เวลาเปิด</dt>
           <dd className="text-[var(--color-ink-muted)]">{place.hours ?? "ไม่ระบุ"}</dd>
         </div>
+        {place.wifi !== undefined && (
+          <div className="flex gap-1.5">
+            <dt className="text-[var(--color-ink-faint)]">Wi-Fi</dt>
+            <dd className="text-[var(--color-ink-muted)]">{place.wifi ? "มี (ฟรี)" : "ไม่มี"}</dd>
+          </div>
+        )}
+        {place.outdoorSeating !== undefined && (
+          <div className="flex gap-1.5">
+            <dt className="text-[var(--color-ink-faint)]">ที่นั่งกลางแจ้ง</dt>
+            <dd className="text-[var(--color-ink-muted)]">{place.outdoorSeating ? "มี" : "ไม่มี"}</dd>
+          </div>
+        )}
         <div className="flex gap-1.5">
           <dt className="text-[var(--color-ink-faint)]">พิกัด</dt>
           <dd className="tabular-nums text-[var(--color-ink-muted)]">
@@ -58,6 +83,35 @@ export default function PlacePopup({
           </dd>
         </div>
       </dl>
+
+      {(place.phone || place.website) && (
+        <div className="mt-2 flex flex-wrap gap-x-4">
+          {place.phone && (
+            <a
+              href={`tel:${place.phone.replace(/[^+\d]/g, "")}`}
+              className="inline-flex min-h-11 items-center rounded text-[12px] text-[var(--color-primary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+            >
+              {place.phone}
+            </a>
+          )}
+          {place.website && (
+            <a
+              href={place.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center rounded text-[12px] text-[var(--color-primary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+            >
+              เว็บไซต์ร้าน
+            </a>
+          )}
+        </div>
+      )}
+
+      {place.dataNote && (
+        <p className="mt-2 border-t border-[var(--color-hairline)] pt-2 text-[11px] leading-relaxed text-[var(--color-ink-faint)]">
+          ⚠ {place.dataNote}
+        </p>
+      )}
     </div>
   );
 }

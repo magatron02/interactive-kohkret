@@ -52,6 +52,20 @@ export type Place = {
   description?: string;
   /** Omitted when the place does not publish hours. */
   hours?: string;
+  /** Thai labels derived from the OSM `cuisine` tag. */
+  cuisine?: string[];
+  /** Verbatim from the OSM `phone` tag — not reformatted, so it cannot be corrupted in transit. */
+  phone?: string;
+  website?: string;
+  /** Only set when OSM states it either way; undefined means "not recorded", not "no". */
+  wifi?: boolean;
+  outdoorSeating?: boolean;
+  /**
+   * Set when the entry rests on weaker evidence than the rest of the dataset, and shown to the reader.
+   * Deleting a place because a guidebook missed it would be its own kind of dishonesty; hiding how
+   * thin the evidence is would be worse.
+   */
+  dataNote?: string;
 };
 
 export const PLACES: Place[] = [
@@ -100,6 +114,11 @@ export const PLACES: Place[] = [
     lng: 100.47367,
     mapX: 39.5,
     mapY: 30.5,
+    // Every other temple here carries a Wikidata id and a secondary source. This one has neither: it is a
+    // lone OSM building (way/1184261576) with a name and nothing else, and the Thai Wikipedia article on
+    // เกาะเกร็ด does not list it. The วัดจันทร์ that Wikipedia does document is in บางกรวย, a different
+    // district. Kept because OSM is a real source, flagged because it is the only one.
+    dataNote: "ปรากฏใน OpenStreetMap เท่านั้น ยังไม่พบแหล่งอ้างอิงอื่นยืนยัน",
   },
   {
     id: "wat-sala-kun",
@@ -135,6 +154,9 @@ export const PLACES: Place[] = [
     mapX: 109,
     mapY: 28.4,
     hours: "10:00–16:00",
+    cuisine: ["ร้านกาแฟ", "ของหวาน", "เค้ก"],
+    phone: "0967943836",
+    outdoorSeating: false,
   },
   {
     id: "baan-rim-nam-home-cafe",
@@ -144,7 +166,15 @@ export const PLACES: Place[] = [
     lng: 100.49097,
     mapX: 129,
     mapY: 38.9,
+    // Verbatim from the OSM `description` tag on node/10902425966.
+    description:
+      "บ้านริมน้ำบนเกาะเกร็ด นั่งชิลชิลชมวิวเจ้าพระยา กับกาแฟ เครื่องดื่มและของหวานอร่อยๆ ชิคๆ ชิลๆ",
     hours: "จ.–ส. 09:00–18:00",
+    cuisine: ["ร้านกาแฟ", "เบอร์เกอร์", "อาหารพื้นถิ่น"],
+    phone: "+66830840185",
+    website: "https://baanrimnamkohkret.blogspot.com/",
+    wifi: true,
+    outdoorSeating: true,
   },
   {
     id: "raan-me-rak",
@@ -154,6 +184,27 @@ export const PLACES: Place[] = [
     lng: 100.49103,
     mapX: 129.3,
     mapY: 40.7,
+    cuisine: ["ร้านกาแฟ", "อาหารไทย"],
+    phone: "0918852408",
+    website: "https://www.facebook.com/Ranmeeruk/?locale=th_TH",
+    wifi: false,
+    outdoorSeating: true,
+  },
+  {
+    // Not in OpenStreetMap. Coordinates recovered from the venue's own published Google Maps pin
+    // (the place marker in the resolved link, not the map viewport centre) and confirmed to fall
+    // inside the coastline polygon. Hours and phone from a dated review listing.
+    id: "rangnok-cafe",
+    name: "รังนก คาเฟ่ แอนด์ บาร์",
+    nameEn: "Rangnok Cafe & Bar",
+    category: "cafe",
+    lat: 13.916073,
+    lng: 100.4772542,
+    mapX: 58.1,
+    mapY: 14.5,
+    description: "คาเฟ่ริมแม่น้ำตกแต่งสไตล์บาหลี มีมุมรังนกสำหรับถ่ายรูป เปิดถึงเที่ยงคืน",
+    hours: "ทุกวัน 11:00–24:00",
+    phone: "02 036 7865",
   },
 
   {
@@ -164,6 +215,8 @@ export const PLACES: Place[] = [
     lng: 100.46739,
     mapX: 7.1,
     mapY: 37.5,
+    description: "อยู่ปลายเกาะฝั่งตะวันตก ห่างจากทางเดินสายหลักที่สุดในบรรดาร้านบนเกาะ",
+    dataNote: "ที่อยู่ตรงกับ ร.ศ.๑๒๗ ในข้าวมีคำ (40 หมู่ 4) และหมุดห่างกัน 18 ม. อาจเป็นบริเวณเดียวกัน",
   },
   {
     id: "baan-rim-nam",
@@ -182,6 +235,41 @@ export const PLACES: Place[] = [
     lng: 100.49096,
     mapX: 129,
     mapY: 43.3,
+    cuisine: ["อาหารไทย"],
+  },
+  {
+    // Not in OpenStreetMap. Coordinates from the venue's published Google Maps pin.
+    id: "tiao-ing-nam",
+    name: "เตี๋ยวอิงน้ำ",
+    category: "restaurant",
+    lat: 13.9132835,
+    lng: 100.4881363,
+    mapX: 114.4,
+    mapY: 28.9,
+    description: "ร้านก๋วยเตี๋ยวริมน้ำ ตกแต่งแบบไทยโบราณผสมสมัยใหม่",
+    hours: "09:30–17:00 (ปิดวันจันทร์)",
+    cuisine: ["ก๋วยเตี๋ยว"],
+    phone: "085 333 7819",
+  },
+  {
+    // Not in OpenStreetMap. Coordinates from the restaurant's own website map link.
+    id: "rorsor-127",
+    name: "ร.ศ.๑๒๗ ในข้าวมีคำ",
+    nameEn: "Rorsor 127",
+    category: "restaurant",
+    lat: 13.9114663,
+    lng: 100.4674511,
+    mapX: 7.4,
+    mapY: 38.3,
+    description:
+      "อาหารไทยในเรือนไม้อายุกว่าร้อยปีริมน้ำ ชื่อร้านมาจากโฉนดที่ดินที่ออกในปี ร.ศ. 127 (พ.ศ. 2451) เข้าถึงโดยเรือจากท่าน้ำวัดใหญ่สว่างอารมณ์",
+    cuisine: ["อาหารไทย"],
+    phone: "088 895 5566",
+    website: "https://rorsor127.com/",
+    // Both this restaurant and RIVA EATERY & BAR publish the address "40 หมู่ 4 เกาะเกร็ด", and their
+    // map pins are 18 m apart. They are either one venue under two names or two businesses sharing a
+    // compound; no source settles it, so both are kept and the overlap is stated rather than guessed away.
+    dataNote: "ที่อยู่ตรงกับ RIVA EATERY & BAR (40 หมู่ 4) และหมุดห่างกัน 18 ม. อาจเป็นบริเวณเดียวกัน",
   },
 
   {
@@ -192,6 +280,7 @@ export const PLACES: Place[] = [
     lng: 100.48945,
     mapX: 121.2,
     mapY: 83.6,
+    description: "ที่พักแห่งเดียวบนเกาะที่ปรากฏใน OpenStreetMap อยู่ทางใต้ของเกาะใกล้ท่าเรือป่าฝ้าย",
   },
 
   {
@@ -227,6 +316,7 @@ export const PLACES: Place[] = [
     lng: 100.49031,
     mapX: 125.6,
     mapY: 73.5,
+    description: "ท่าเรือข้ามฟากทางใต้ของเกาะ ขึ้นทะเบียนเป็นสถานีขนส่งสาธารณะใน OpenStreetMap",
   },
 ];
 
@@ -288,11 +378,12 @@ export const ROUTES: TourRoute[] = [
     tagline: "จิบกาแฟริมเจ้าพระยา",
     color: "var(--color-route-3)",
     ink: "var(--color-route-3-ink)",
-    durationLabel: "3 จุด · 2–3 ชม.",
+    durationLabel: "4 จุด · 3–4 ชม.",
     stops: [
-      { placeId: "hom-fung-pang-nom", time: "10:00" },
-      { placeId: "baan-rim-nam-home-cafe", time: "11:30" },
-      { placeId: "raan-me-rak", time: "13:00" },
+      { placeId: "rangnok-cafe", time: "11:00" },
+      { placeId: "hom-fung-pang-nom", time: "12:30" },
+      { placeId: "baan-rim-nam-home-cafe", time: "14:00" },
+      { placeId: "raan-me-rak", time: "15:30" },
     ],
   },
   {
@@ -301,11 +392,13 @@ export const ROUTES: TourRoute[] = [
     tagline: "ร้านริมแม่น้ำทั้งสองฝั่งเกาะ",
     color: "var(--color-route-4)",
     ink: "var(--color-route-4-ink)",
-    durationLabel: "3 จุด · 2–3 ชม.",
+    durationLabel: "5 จุด · 4–5 ชม.",
     stops: [
-      { placeId: "riva-eatery-bar", time: "11:30" },
-      { placeId: "baan-rim-nam", time: "13:00" },
-      { placeId: "delicious-thai-food", time: "14:30" },
+      { placeId: "rorsor-127", time: "11:00" },
+      { placeId: "riva-eatery-bar", time: "12:00" },
+      { placeId: "tiao-ing-nam", time: "13:30" },
+      { placeId: "baan-rim-nam", time: "15:00" },
+      { placeId: "delicious-thai-food", time: "16:00" },
     ],
   },
   {
