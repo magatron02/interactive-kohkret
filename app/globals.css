@@ -269,6 +269,25 @@ body {
   border-radius: 9999px 9999px 9999px 9999px;
   box-shadow: 0 2px 5px rgb(0 0 0 / 0.55);
 }
+.map-pin__count {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.35rem;
+  display: grid;
+  min-width: 1.05rem;
+  height: 1.05rem;
+  place-items: center;
+  padding: 0 0.2rem;
+  border: 1.5px solid var(--color-bg-map);
+  border-radius: 9999px;
+  background: var(--color-ink);
+  color: var(--color-bg-deep);
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
 /* The stem is a triangle built from borders, so it always matches the head's colour exactly. */
 .map-pin__stem {
   position: absolute;

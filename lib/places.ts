@@ -419,3 +419,23 @@ export function getCategory(id: Category): CategoryMeta {
 export function countByCategory(id: Category): number {
   return PLACES.filter((p) => p.category === id).length;
 }
+
+/**
+ * Ground distance in metres. Equirectangular is exact enough over an island 2.6 km across.
+ */
+export function metresBetween(a: Place, b: Place): number {
+  const kx = Math.cos((13.91 * Math.PI) / 180);
+  return Math.hypot((b.lng - a.lng) * 111320 * kx, (b.lat - a.lat) * 110574);
+}
+
+/**
+ * A pin is ~28px wide, which at map scale covers roughly 120 m of ground — so anything closer than
+ * that is hidden underneath its neighbour. Four riverside places sit within 15–72 m of each other and
+ * genuinely do overlap. Rather than shifting markers off their real coordinates to tidy the picture,
+ * the ones underneath stay reachable through the pin's count badge and the popup's list.
+ */
+export const OVERLAP_METRES = 120;
+
+export function placesAtSameSpot(place: Place, candidates: Place[] = PLACES): Place[] {
+  return candidates.filter((p) => p.id !== place.id && metresBetween(p, place) <= OVERLAP_METRES);
+}

@@ -1,4 +1,4 @@
-import { getCategory, type Place } from "@/lib/places";
+import { getCategory, placesAtSameSpot, type Place } from "@/lib/places";
 import { directionsLink, placeLink } from "@/lib/maps-links";
 import { Icon } from "@/lib/icons";
 
@@ -6,12 +6,17 @@ export default function PlacePopup({
   place,
   closing = false,
   onClose,
+  onSelectPlace,
 }: {
   place: Place;
   closing?: boolean;
   onClose: () => void;
+  onSelectPlace: (id: string) => void;
 }) {
   const category = getCategory(place.category);
+  // Markers are never nudged off their real coordinates, so places metres apart genuinely hide each
+  // other on the map. This is how the buried ones stay reachable.
+  const neighbours = placesAtSameSpot(place);
 
   return (
     <div
@@ -127,6 +132,33 @@ export default function PlacePopup({
               เว็บไซต์ร้าน
             </a>
           )}
+        </div>
+      )}
+
+      {neighbours.length > 0 && (
+        <div className="mt-2.5 border-t border-[var(--color-hairline)] pt-2">
+          <p className="text-[11px] text-[var(--color-ink-faint)]">
+            อีก {neighbours.length} แห่งที่จุดเดียวกัน
+          </p>
+          <ul className="mt-1 flex flex-wrap gap-1.5">
+            {neighbours.map((n) => {
+              const nc = getCategory(n.category);
+              return (
+                <li key={n.id}>
+                  <button
+                    type="button"
+                    onClick={() => onSelectPlace(n.id)}
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--color-hairline)] px-2 text-[12px] text-[var(--color-ink-muted)] transition-colors duration-150 hover:border-[var(--color-ink-faint)] hover:text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-elevated)]"
+                  >
+                    <span style={{ color: nc.color }}>
+                      <Icon name={nc.id} className="h-3.5 w-3.5" strokeWidth={1.8} />
+                    </span>
+                    {n.name}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
 

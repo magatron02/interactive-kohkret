@@ -10,7 +10,7 @@ import {
   project,
 } from "@/lib/geo";
 import { ROUTE_GEOMETRY } from "@/lib/route-paths";
-import { getCategory, getPlace, type Place, type TourRoute } from "@/lib/places";
+import { getCategory, getPlace, placesAtSameSpot, type Place, type TourRoute } from "@/lib/places";
 import { Icon } from "@/lib/icons";
 
 const { width: VW, height: VH } = MAP_VIEWBOX;
@@ -155,6 +155,10 @@ export default function MapCanvas({
         const ink = onRoute && activeRoute ? activeRoute.ink : category.ink;
         const isSelected = place.id === selectedPlaceId;
         const { x, y } = project(place.lat, place.lng);
+        // Only the pin painted on top of a cluster carries the badge; z-order is by latitude, so the
+        // southernmost of a group is the one in front.
+        const neighbours = placesAtSameSpot(place, shown);
+        const buried = neighbours.filter((n) => project(n.lat, n.lng).y < y).length;
 
         return (
           <button
@@ -162,9 +166,10 @@ export default function MapCanvas({
             type="button"
             onClick={() => onSelectPlace(place.id)}
             aria-label={
-              visits.length
+              (visits.length
                 ? `จุดที่ ${visits.join(" และ ")} — ${place.name} — ${category.label}`
-                : `${place.name} — ${category.label}`
+                : `${place.name} — ${category.label}`) +
+              (buried > 0 ? ` และอีก ${buried} แห่งที่จุดเดียวกัน` : "")
             }
             title={visits.length > 1 ? `${place.name} (จุดที่ ${visits.join(", ")})` : place.name}
             className={`map-pin ${isSelected ? "map-pin--selected" : ""} ${
@@ -188,6 +193,8 @@ export default function MapCanvas({
                 <Icon name={place.category} className="h-3.5 w-3.5" strokeWidth={1.8} />
               )}
             </span>
+            {/* The pin on top of a stack says how many are under it, so nothing is silently buried. */}
+            {buried > 0 && <span className="map-pin__count">+{buried}</span>}
             <span className="map-pin__stem" style={{ borderTopColor: color }} aria-hidden />
           </button>
         );

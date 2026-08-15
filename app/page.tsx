@@ -95,6 +95,7 @@ export default function Home() {
                 place={selectedPlace}
                 closing={closingPlaceId === selectedPlace.id}
                 onClose={closePopup}
+                onSelectPlace={selectPlace}
               />
             )}
           </div>
