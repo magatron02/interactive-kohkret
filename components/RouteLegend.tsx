@@ -9,7 +9,7 @@ export default function RouteLegend({
   onSelect: (id: string | null) => void;
 }) {
   return (
-    <section aria-labelledby="routes-heading">
+    <section aria-labelledby="routes-heading" className="panel-surface">
       {/* Same reservation as the category panel: the button occupies its space whether or not it is
           shown, so choosing a route does not nudge the map and the legend under it. */}
       <div className="flex min-h-9 items-center justify-between gap-3">

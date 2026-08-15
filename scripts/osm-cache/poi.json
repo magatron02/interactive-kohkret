@@ -1,0 +1,556 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.4 2390de5a",
+  "osm3s": {
+    "timestamp_osm_base": "2026-08-14T14:48:54Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 1388321883,
+  "lat": 13.9126861,
+  "lon": 100.4906939,
+  "tags": {
+    "amenity": "ferry_terminal",
+    "name": "ท่าวัดปรมัยยิกาวาส",
+    "name:en": "Wat Pora Mai Yi Ka Wat Ferry Pier",
+    "name:th": "ท่าวัดปรมัยยิกาวาส"
+  }
+},
+{
+  "type": "node",
+  "id": 2050225450,
+  "lat": 13.9064162,
+  "lon": 100.4831643,
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดศาลากุล",
+    "name:en": "Wat Sala",
+    "name:th": "วัดศาลากุล",
+    "religion": "buddhist",
+    "wikidata": "Q99642790"
+  }
+},
+{
+  "type": "node",
+  "id": 2757815024,
+  "lat": 13.9031602,
+  "lon": 100.4711278,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "ก๋วยเตี๋ยวเรือลุงอู๊ด"
+  }
+},
+{
+  "type": "node",
+  "id": 2757817164,
+  "lat": 13.9046617,
+  "lon": 100.4903118,
+  "tags": {
+    "amenity": "ferry_terminal",
+    "ferry": "yes",
+    "name": "ท่าเรือป่าฝ้าย",
+    "name:en": "Pa Fai",
+    "public_transport": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 3101466187,
+  "lat": 13.9023442,
+  "lon": 100.4718971,
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดแสงสิริธรรม",
+    "name:en": "Wat Saeng Siritham",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "node",
+  "id": 3101484792,
+  "lat": 13.9025477,
+  "lon": 100.4722032,
+  "tags": {
+    "name": "Wat Seangsiritham Floating Market",
+    "tourism": "attraction"
+  }
+},
+{
+  "type": "node",
+  "id": 4054868165,
+  "lat": 13.9159347,
+  "lon": 100.4848710,
+  "tags": {
+    "artwork_subject": "Buddha",
+    "artwork_type": "statue",
+    "source": "Bing;survey",
+    "tourism": "artwork"
+  }
+},
+{
+  "type": "node",
+  "id": 4375029291,
+  "lat": 13.9104921,
+  "lon": 100.4909555,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "thai",
+    "name": "Delicious Thai Food",
+    "name:th": "Delicious Thai Food"
+  }
+},
+{
+  "type": "node",
+  "id": 4662902791,
+  "lat": 13.9026215,
+  "lon": 100.4758822,
+  "tags": {
+    "name:en": "Batik Fabric House",
+    "tourism": "artwork"
+  }
+},
+{
+  "type": "node",
+  "id": 9810540017,
+  "lat": 13.9162963,
+  "lon": 100.4877253,
+  "tags": {
+    "amenity": "restaurant",
+    "list:fmm_0000": "yes",
+    "name": "Hinghoy Harmony",
+    "name:th": "หิ่งห้อยฮาร์โมนี่",
+    "opening_hours": "Su-Mo 11:00-23:00"
+  }
+},
+{
+  "type": "node",
+  "id": 9833133424,
+  "lat": 13.9116248,
+  "lon": 100.4673943,
+  "tags": {
+    "addr:city": "ตำบลเกาะเกร็ด",
+    "addr:housenumber": "40 ม.4",
+    "addr:postcode": "11120",
+    "amenity": "restaurant",
+    "name": "RIVA EATERY & BAR"
+  }
+},
+{
+  "type": "node",
+  "id": 10750262805,
+  "lat": 13.9139024,
+  "lon": 100.4670583,
+  "tags": {
+    "name:en": "Wat Chan Ferry Port",
+    "tourism": "viewpoint"
+  }
+},
+{
+  "type": "node",
+  "id": 10750262806,
+  "lat": 13.9155482,
+  "lon": 100.4793134,
+  "tags": {
+    "name:en": "Wat Makham Thong Ferry Port",
+    "tourism": "viewpoint"
+  }
+},
+{
+  "type": "node",
+  "id": 10750262807,
+  "lat": 13.9122510,
+  "lon": 100.4775310,
+  "tags": {
+    "name:en": "Lovely New Walkway Through the Middle of Ko Kret",
+    "tourism": "viewpoint"
+  }
+},
+{
+  "type": "node",
+  "id": 10750262808,
+  "lat": 13.9129925,
+  "lon": 100.4738603,
+  "tags": {
+    "name:en": "End of New Walkway",
+    "tourism": "viewpoint"
+  }
+},
+{
+  "type": "node",
+  "id": 10750262905,
+  "lat": 13.9126147,
+  "lon": 100.4797003,
+  "tags": {
+    "name:en": "Start of New Walkway",
+    "tourism": "viewpoint"
+  }
+},
+{
+  "type": "node",
+  "id": 10902425966,
+  "lat": 13.9113487,
+  "lon": 100.4909685,
+  "tags": {
+    "addr:city": "ตำบลเกาะเกร็ด",
+    "addr:housenumber": "11 หมู่",
+    "addr:postcode": "11120",
+    "addr:street": "ถนนสุขาประชาสรรค์",
+    "amenity": "cafe",
+    "brand": "บ้านริมน้ำ",
+    "cuisine": "coffee_shop;burger;regional",
+    "description": "บ้านริมน้ำบนเกาะเกร็ด นั่งชิลชิลชมวิวเจ้าพระยา กับกาแฟ เครื่องดื่มและของหวานอร่อยๆ ชิคๆ ชิลๆ",
+    "internet_access": "wlan",
+    "internet_access:fee": "no",
+    "name": "บ้านริมน้ำ โฮมคาเฟ่ เกาะเกร็ด",
+    "opening_hours": "Mo-Sa 09:00-18:00",
+    "outdoor_seating": "yes",
+    "phone": "+66830840185",
+    "website": "https://baanrimnamkohkret.blogspot.com/"
+  }
+},
+{
+  "type": "node",
+  "id": 13514424141,
+  "lat": 13.9133769,
+  "lon": 100.4871027,
+  "tags": {
+    "addr:district": "ปากเกร็ด",
+    "addr:housenumber": "11/3",
+    "addr:place": "บ้านโอ่งอ่าง",
+    "addr:postcode": "11120",
+    "addr:province": "นนทบุรี",
+    "addr:subdistrict": "เกาะเกร็ด",
+    "amenity": "cafe",
+    "bar": "no",
+    "contact:facebook": "https://www.facebook.com/share/1DVnYyTc3M/?mibextid=wwXIfr",
+    "cuisine": "coffee_shop;dessert;cake",
+    "diet:local": "yes",
+    "name": "หอมฟุ้งปังนม ณ เกาะเกร็ด",
+    "opening_hours": "10.00-16.00",
+    "outdoor_seating": "no",
+    "phone": "0967943836",
+    "reg_name": "หอมฟุ้งปังนม"
+  }
+},
+{
+  "type": "node",
+  "id": 13624661956,
+  "lat": 13.9111364,
+  "lon": 100.4910221,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "บ้านริมน้ำ"
+  }
+},
+{
+  "type": "node",
+  "id": 13639844890,
+  "lat": 13.9110115,
+  "lon": 100.4910293,
+  "tags": {
+    "addr:district": "อำเภอปากเกร็ด",
+    "addr:housenumber": "15/3",
+    "addr:place": "1",
+    "addr:postcode": "11120",
+    "addr:province": "นนทบุรี",
+    "addr:subdistrict": "ตำบล เกาะเกร็ด",
+    "amenity": "cafe",
+    "cuisine": "coffee_shop;thai",
+    "internet_access": "no",
+    "name": "ร้านมีรักษ์",
+    "outdoor_seating": "yes",
+    "phone": "0918852408",
+    "website": "https://www.facebook.com/Ranmeeruk/?locale=th_TH"
+  }
+},
+{
+  "type": "node",
+  "id": 14088178902,
+  "lat": 13.9026961,
+  "lon": 100.4894505,
+  "tags": {
+    "name": "Baanya Homestay",
+    "tourism": "guest_house"
+  }
+},
+{
+  "type": "way",
+  "id": 194521662,
+  "center": {
+    "lat": 13.9126842,
+    "lon": 100.4906314
+  },
+  "tags": {
+    "man_made": "pier"
+  }
+},
+{
+  "type": "way",
+  "id": 194521680,
+  "center": {
+    "lat": 13.9127076,
+    "lon": 100.4899870
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดปรมัยยิกาวาส",
+    "name:en": "Wat Pora Mai Yi Ka Wat",
+    "name:th": "วัดปรมัยยิกาวาส",
+    "religion": "buddhist",
+    "tourism": "attraction",
+    "wikidata": "Q2552310",
+    "wikimedia_commons": "Category:Wat Paramai Yikawat",
+    "wikipedia": "en:Wat Paramaiyikawat"
+  }
+},
+{
+  "type": "way",
+  "id": 200581824,
+  "center": {
+    "lat": 13.9004395,
+    "lon": 100.4756037
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "muslim"
+  }
+},
+{
+  "type": "way",
+  "id": 200582178,
+  "center": {
+    "lat": 13.9021355,
+    "lon": 100.4718089
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดแสงสิริธรรม",
+    "name:en": "Wat Saeng Siritham",
+    "name:th": "วัดแสงสิริธรรม",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 270796015,
+  "center": {
+    "lat": 13.9139146,
+    "lon": 100.4670271
+  },
+  "tags": {
+    "man_made": "pier"
+  }
+},
+{
+  "type": "way",
+  "id": 352102184,
+  "center": {
+    "lat": 13.9046949,
+    "lon": 100.4902593
+  },
+  "tags": {
+    "area": "yes",
+    "man_made": "pier",
+    "name": "ท่าเรือป่าฝ้าย"
+  }
+},
+{
+  "type": "way",
+  "id": 376466921,
+  "center": {
+    "lat": 13.9178073,
+    "lon": 100.4853518
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "Wat Baan Jaak",
+    "name:th": "วัดบางจาก",
+    "religion": "buddhist",
+    "wikidata": "Q36449174"
+  }
+},
+{
+  "type": "way",
+  "id": 376466927,
+  "center": {
+    "lat": 13.9137427,
+    "lon": 100.4829717
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดเสาธงทอง",
+    "name:en": "Wat Sao Thong Thong",
+    "religion": "buddhist",
+    "wikidata": "Q60661528",
+    "wikimedia_commons": "Category:Wat Sao Thong Thong, Nonthaburi"
+  }
+},
+{
+  "type": "way",
+  "id": 376466928,
+  "center": {
+    "lat": 13.9126822,
+    "lon": 100.4858138
+  },
+  "tags": {
+    "addr:district": "ปากเกร็ด",
+    "addr:place": "บ้านโอ่งอ่าง",
+    "addr:postcode": "11120",
+    "addr:province": "นนทบุรี",
+    "addr:subdistrict": "เกาะเกร็ด",
+    "amenity": "place_of_worship",
+    "check_date": "2024-11-10",
+    "name": "วัดไผ่ล้อม",
+    "name:en": "Wat Phai Lom",
+    "religion": "buddhist",
+    "wikidata": "Q99642791"
+  }
+},
+{
+  "type": "way",
+  "id": 376679554,
+  "center": {
+    "lat": 13.9062701,
+    "lon": 100.4898278
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดฉิมพลีสุทธาวาส",
+    "name:en": "Wat Chimphli Sutthawat",
+    "religion": "buddhist",
+    "wikidata": "Q63533717",
+    "wikimedia_commons": "Category:Wat Chimphli Sutthawat, Nonthaburi"
+  }
+},
+{
+  "type": "way",
+  "id": 1154006236,
+  "center": {
+    "lat": 13.9126353,
+    "lon": 100.4900203
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1154006241,
+  "center": {
+    "lat": 13.9062518,
+    "lon": 100.4897625
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1154006242,
+  "center": {
+    "lat": 13.9064672,
+    "lon": 100.4899350
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1154377946,
+  "center": {
+    "lat": 13.9137458,
+    "lon": 100.4834062
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1154377947,
+  "center": {
+    "lat": 13.9134084,
+    "lon": 100.4847295
+  },
+  "tags": {
+    "building": "yes",
+    "craft": "pottery"
+  }
+},
+{
+  "type": "way",
+  "id": 1154377954,
+  "center": {
+    "lat": 13.9134654,
+    "lon": 100.4871006
+  },
+  "tags": {
+    "amenity": "restaurant",
+    "building": "yes",
+    "layer": "1"
+  }
+},
+{
+  "type": "way",
+  "id": 1154505772,
+  "center": {
+    "lat": 13.9126385,
+    "lon": 100.4897403
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1184261576,
+  "center": {
+    "lat": 13.9129732,
+    "lon": 100.4736651
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "name": "วัดจันทร์",
+    "name:en": "Wat Chan",
+    "name:th": "วัดจันทร์",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1418900394,
+  "center": {
+    "lat": 13.9130984,
+    "lon": 100.4852514
+  },
+  "tags": {
+    "addr:district": "ปากเกร็ด",
+    "addr:postcode": "11120",
+    "addr:province": "นนทบุรี",
+    "addr:subdistrict": "เกาะเกร็ด",
+    "building": "yes",
+    "craft": "pottery",
+    "name": "โรงงานเครื่องปั้นดินเผาป้าตุ่ม",
+    "name:en": "Pa Tum Pottery Factory",
+    "opening_hours": "Mo-Su 09:00-17:00"
+  }
+}
+
+  ]
+}

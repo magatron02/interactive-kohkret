@@ -1,0 +1,334 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-08-15T03:54:34Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 1388321883,
+  "lat": 13.9126861,
+  "lon": 100.4906939,
+  "tags": {
+    "amenity": "ferry_terminal",
+    "name": "ท่าวัดปรมัยยิกาวาส",
+    "name:en": "Wat Pora Mai Yi Ka Wat Ferry Pier",
+    "name:th": "ท่าวัดปรมัยยิกาวาส"
+  }
+},
+{
+  "type": "node",
+  "id": 2757815024,
+  "lat": 13.9031602,
+  "lon": 100.4711278,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "ก๋วยเตี๋ยวเรือลุงอู๊ด"
+  }
+},
+{
+  "type": "node",
+  "id": 2757817164,
+  "lat": 13.9046617,
+  "lon": 100.4903118,
+  "tags": {
+    "amenity": "ferry_terminal",
+    "ferry": "yes",
+    "name": "ท่าเรือป่าฝ้าย",
+    "name:en": "Pa Fai",
+    "public_transport": "station"
+  }
+},
+{
+  "type": "node",
+  "id": 2769486127,
+  "lat": 13.9092770,
+  "lon": 100.4908590,
+  "tags": {
+    "addr:city": "ตำบลเกาะเกร็ด",
+    "addr:district": "อำเภอปากเกร็ด",
+    "addr:housenumber": "หมู่ 1",
+    "addr:place": "เกาะเกร็ด",
+    "addr:postcode": "WF5R+P89 , 11120",
+    "addr:province": "นนทบุรี",
+    "addr:street": "ทางรอบเกาะ",
+    "addr:subdistrict": "ตำบล เกาะเกร็ด",
+    "amenity": "bar",
+    "check_date": "2025-08-16",
+    "check_date:currency:XBT": "2026-05-23",
+    "contact:email": "wichit.saiklao@gmail.com",
+    "contact:facebook": "https://www.facebook.com/Chitbeer",
+    "currency:XBT": "yes",
+    "description": "homebrew microbrew craft beer",
+    "name": "Chitbeer",
+    "opening_hours": "Sa,Su 12:00-21:00",
+    "payment:lightning": "yes",
+    "payment:lightning_contactless": "no",
+    "payment:onchain": "no",
+    "phone": "+66 89 799 1123",
+    "survey:date": "2025-03-09",
+    "website": "https://chitbrewery.com/"
+  }
+},
+{
+  "type": "node",
+  "id": 3101484792,
+  "lat": 13.9025477,
+  "lon": 100.4722032,
+  "tags": {
+    "name": "Wat Seangsiritham Floating Market",
+    "tourism": "attraction"
+  }
+},
+{
+  "type": "node",
+  "id": 4054868165,
+  "lat": 13.9159347,
+  "lon": 100.4848710,
+  "tags": {
+    "artwork_subject": "Buddha",
+    "artwork_type": "statue",
+    "source": "Bing;survey",
+    "tourism": "artwork"
+  }
+},
+{
+  "type": "node",
+  "id": 4375029291,
+  "lat": 13.9104921,
+  "lon": 100.4909555,
+  "tags": {
+    "amenity": "restaurant",
+    "cuisine": "thai",
+    "name": "Delicious Thai Food",
+    "name:th": "Delicious Thai Food"
+  }
+},
+{
+  "type": "node",
+  "id": 4662902791,
+  "lat": 13.9026215,
+  "lon": 100.4758822,
+  "tags": {
+    "name:en": "Batik Fabric House",
+    "tourism": "artwork"
+  }
+},
+{
+  "type": "node",
+  "id": 9810540017,
+  "lat": 13.9162963,
+  "lon": 100.4877253,
+  "tags": {
+    "amenity": "restaurant",
+    "list:fmm_0000": "yes",
+    "name": "Hinghoy Harmony",
+    "name:th": "หิ่งห้อยฮาร์โมนี่",
+    "opening_hours": "Su-Mo 11:00-23:00"
+  }
+},
+{
+  "type": "node",
+  "id": 9833133424,
+  "lat": 13.9116248,
+  "lon": 100.4673943,
+  "tags": {
+    "addr:city": "ตำบลเกาะเกร็ด",
+    "addr:housenumber": "40 ม.4",
+    "addr:postcode": "11120",
+    "amenity": "restaurant",
+    "name": "RIVA EATERY & BAR"
+  }
+},
+{
+  "type": "node",
+  "id": 10902425966,
+  "lat": 13.9113487,
+  "lon": 100.4909685,
+  "tags": {
+    "addr:city": "ตำบลเกาะเกร็ด",
+    "addr:housenumber": "11 หมู่",
+    "addr:postcode": "11120",
+    "addr:street": "ถนนสุขาประชาสรรค์",
+    "amenity": "cafe",
+    "brand": "บ้านริมน้ำ",
+    "cuisine": "coffee_shop;burger;regional",
+    "description": "บ้านริมน้ำบนเกาะเกร็ด นั่งชิลชิลชมวิวเจ้าพระยา กับกาแฟ เครื่องดื่มและของหวานอร่อยๆ ชิคๆ ชิลๆ",
+    "internet_access": "wlan",
+    "internet_access:fee": "no",
+    "name": "บ้านริมน้ำ โฮมคาเฟ่ เกาะเกร็ด",
+    "opening_hours": "Mo-Sa 09:00-18:00",
+    "outdoor_seating": "yes",
+    "phone": "+66830840185",
+    "website": "https://baanrimnamkohkret.blogspot.com/"
+  }
+},
+{
+  "type": "node",
+  "id": 13514424141,
+  "lat": 13.9133769,
+  "lon": 100.4871027,
+  "tags": {
+    "addr:district": "ปากเกร็ด",
+    "addr:housenumber": "11/3",
+    "addr:place": "บ้านโอ่งอ่าง",
+    "addr:postcode": "11120",
+    "addr:province": "นนทบุรี",
+    "addr:subdistrict": "เกาะเกร็ด",
+    "amenity": "cafe",
+    "bar": "no",
+    "contact:facebook": "https://www.facebook.com/share/1DVnYyTc3M/?mibextid=wwXIfr",
+    "cuisine": "coffee_shop;dessert;cake",
+    "diet:local": "yes",
+    "name": "หอมฟุ้งปังนม ณ เกาะเกร็ด",
+    "opening_hours": "10.00-16.00",
+    "outdoor_seating": "no",
+    "phone": "0967943836",
+    "reg_name": "หอมฟุ้งปังนม"
+  }
+},
+{
+  "type": "node",
+  "id": 13624661956,
+  "lat": 13.9111364,
+  "lon": 100.4910221,
+  "tags": {
+    "amenity": "restaurant",
+    "name": "บ้านริมน้ำ"
+  }
+},
+{
+  "type": "node",
+  "id": 13639844890,
+  "lat": 13.9110115,
+  "lon": 100.4910293,
+  "tags": {
+    "addr:district": "อำเภอปากเกร็ด",
+    "addr:housenumber": "15/3",
+    "addr:place": "1",
+    "addr:postcode": "11120",
+    "addr:province": "นนทบุรี",
+    "addr:subdistrict": "ตำบล เกาะเกร็ด",
+    "amenity": "cafe",
+    "cuisine": "coffee_shop;thai",
+    "internet_access": "no",
+    "name": "ร้านมีรักษ์",
+    "outdoor_seating": "yes",
+    "phone": "0918852408",
+    "website": "https://www.facebook.com/Ranmeeruk/?locale=th_TH"
+  }
+},
+{
+  "type": "node",
+  "id": 14088178902,
+  "lat": 13.9026961,
+  "lon": 100.4894505,
+  "tags": {
+    "name": "Baanya Homestay",
+    "tourism": "guest_house"
+  }
+},
+{
+  "type": "way",
+  "id": 194521662,
+  "center": {
+    "lat": 13.9126842,
+    "lon": 100.4906314
+  },
+  "tags": {
+    "man_made": "pier"
+  }
+},
+{
+  "type": "way",
+  "id": 194521680,
+  "center": {
+    "lat": 13.9127076,
+    "lon": 100.4899870
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดปรมัยยิกาวาส",
+    "name:en": "Wat Pora Mai Yi Ka Wat",
+    "name:th": "วัดปรมัยยิกาวาส",
+    "religion": "buddhist",
+    "tourism": "attraction",
+    "wikidata": "Q2552310",
+    "wikimedia_commons": "Category:Wat Paramai Yikawat",
+    "wikipedia": "en:Wat Paramaiyikawat"
+  }
+},
+{
+  "type": "way",
+  "id": 270796015,
+  "center": {
+    "lat": 13.9139146,
+    "lon": 100.4670271
+  },
+  "tags": {
+    "man_made": "pier"
+  }
+},
+{
+  "type": "way",
+  "id": 352102184,
+  "center": {
+    "lat": 13.9046949,
+    "lon": 100.4902593
+  },
+  "tags": {
+    "area": "yes",
+    "man_made": "pier",
+    "name": "ท่าเรือป่าฝ้าย"
+  }
+},
+{
+  "type": "way",
+  "id": 1154377947,
+  "center": {
+    "lat": 13.9134084,
+    "lon": 100.4847295
+  },
+  "tags": {
+    "building": "yes",
+    "craft": "pottery"
+  }
+},
+{
+  "type": "way",
+  "id": 1154377954,
+  "center": {
+    "lat": 13.9134654,
+    "lon": 100.4871006
+  },
+  "tags": {
+    "amenity": "restaurant",
+    "building": "yes",
+    "layer": "1"
+  }
+},
+{
+  "type": "way",
+  "id": 1418900394,
+  "center": {
+    "lat": 13.9130984,
+    "lon": 100.4852514
+  },
+  "tags": {
+    "addr:district": "ปากเกร็ด",
+    "addr:postcode": "11120",
+    "addr:province": "นนทบุรี",
+    "addr:subdistrict": "เกาะเกร็ด",
+    "building": "yes",
+    "craft": "pottery",
+    "name": "โรงงานเครื่องปั้นดินเผาป้าตุ่ม",
+    "name:en": "Pa Tum Pottery Factory",
+    "opening_hours": "Mo-Su 09:00-17:00"
+  }
+}
+
+  ]
+}

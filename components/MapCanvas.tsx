@@ -100,34 +100,86 @@ export default function MapCanvas({
   const svgRef = useRef<SVGSVGElement>(null);
   const drag = useRef<{ px: number; py: number; fx: number; fy: number } | null>(null);
 
+  /**
+   * Zoom eases toward a target instead of jumping to it. The viewBox is an attribute, so CSS cannot
+   * transition it — this tweens the four numbers on rAF with the same ease-out curve the rest of the
+   * app uses. Panning writes straight through, because a drag should track the finger exactly.
+   */
+  const target = useRef<Frame>(frame);
+  const raf = useRef<number | null>(null);
+  // 0.22 per frame settles within a pixel in about seven frames at 60Hz: quick, but visibly eased.
+  const EASE_K = 0.22;
+  const ease = (cur: Frame, t: Frame): Frame => ({
+    x: cur.x + (t.x - cur.x) * EASE_K,
+    y: cur.y + (t.y - cur.y) * EASE_K,
+    w: cur.w + (t.w - cur.w) * EASE_K,
+    h: cur.h + (t.h - cur.h) * EASE_K,
+  });
+  const animateTo = useCallback((next: Frame) => {
+    target.current = next;
+    // Take the first step synchronously. The input then always produces movement, even where rAF is
+    // throttled — a background tab, a headless render — rather than being silently dropped.
+    setFrame((cur) => ease(cur, next));
+    if (raf.current !== null) return;
+    const step = () => {
+      raf.current = null;
+      setFrame((cur) => {
+        const t = target.current;
+        if (Math.abs(t.x - cur.x) + Math.abs(t.y - cur.y) + Math.abs(t.w - cur.w) < 0.02) return t;
+        raf.current = requestAnimationFrame(step);
+        return ease(cur, t);
+      });
+    };
+    raf.current = requestAnimationFrame(step);
+  }, []);
+  useEffect(() => () => {
+    if (raf.current !== null) cancelAnimationFrame(raf.current);
+  }, []);
+
+  const setFrameNow = useCallback((f: Frame) => {
+    target.current = f;
+    setFrame(f);
+  }, []);
+
   // A breakpoint change re-frames the map, which resets any zoom — the tall crop is a different view.
-  useEffect(() => setFrame(base), [base]);
+  useEffect(() => setFrameNow(base), [base, setFrameNow]);
 
   const zoomed = frame.w < base.w - 0.001;
 
   /** Zoom about a focal point given in 0..1 of the current frame, so the spot under the cursor stays put. */
   const zoomBy = useCallback(
     (factor: number, fx = 0.5, fy = 0.5) => {
-      setFrame((prev) => {
-        const w = prev.w / factor;
-        const next = clampFrame(base, {
+      const prev = target.current;
+      const w = prev.w / factor;
+      const h = w * (base.h / base.w);
+      animateTo(
+        clampFrame(base, {
           w,
-          h: w * (base.h / base.w),
+          h,
           x: prev.x + (prev.w - w) * fx,
-          y: prev.y + (prev.h - w * (base.h / base.w)) * fy,
-        });
-        return next;
-      });
+          y: prev.y + (prev.h - h) * fy,
+        })
+      );
     },
-    [base]
+    [base, animateTo]
   );
 
-  function onWheel(e: React.WheelEvent<SVGSVGElement>) {
-    if (!svgRef.current) return;
-    e.preventDefault();
-    const r = svgRef.current.getBoundingClientRect();
-    zoomBy(e.deltaY < 0 ? 1.2 : 1 / 1.2, (e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
-  }
+  /**
+   * Wheel-to-zoom has to be a native non-passive listener. React routes onWheel through a delegated
+   * passive listener, so preventDefault there is ignored and the page scrolls away underneath the
+   * zoom. Bound directly on the element, it stops.
+   */
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const r = el.getBoundingClientRect();
+      zoomBy(e.deltaY < 0 ? 1.25 : 1 / 1.25, (e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [zoomBy]);
 
   function onPointerDown(e: React.PointerEvent<SVGSVGElement>) {
     if (!zoomed) return;
@@ -139,7 +191,8 @@ export default function MapCanvas({
     const d = drag.current;
     if (!d || !svgRef.current) return;
     const r = svgRef.current.getBoundingClientRect();
-    setFrame((prev) =>
+    const prev = target.current;
+    setFrameNow(
       clampFrame(base, {
         ...prev,
         x: d.fx - ((e.clientX - d.px) / r.width) * prev.w,
@@ -179,7 +232,6 @@ export default function MapCanvas({
         className={`block h-auto w-full touch-none ${zoomed ? "cursor-grab active:cursor-grabbing" : ""}`}
         role="img"
         aria-label="แผนที่เกาะเกร็ดและพื้นที่โดยรอบ แสดงแม่น้ำเจ้าพระยา ชายฝั่งจริง และโครงข่ายถนนจริงจาก OpenStreetMap"
-        onWheel={onWheel}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
@@ -255,7 +307,7 @@ export default function MapCanvas({
         </button>
         <button
           type="button"
-          onClick={() => setFrame(base)}
+          onClick={() => animateTo(base)}
           aria-label="กลับไปมุมมองเต็มเกาะ"
           disabled={!zoomed}
           className="map-zoom-btn text-[10px] disabled:opacity-35"

@@ -11,7 +11,7 @@ export default function CategoryPanel({
   onClear: () => void;
 }) {
   return (
-    <section aria-labelledby="categories-heading">
+    <section aria-labelledby="categories-heading" className="panel-surface">
       {/* The clear button is always in the layout and only its visibility changes. Mounting it on
           selection shifted this whole column down by its own height every time a chip was tapped. */}
       <div className="flex min-h-9 items-center justify-between gap-3">

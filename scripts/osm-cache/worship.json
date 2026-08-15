@@ -1,0 +1,234 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-08-15T03:53:34Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 2050225450,
+  "lat": 13.9064162,
+  "lon": 100.4831643,
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดศาลากุล",
+    "name:en": "Wat Sala",
+    "name:th": "วัดศาลากุล",
+    "religion": "buddhist",
+    "wikidata": "Q99642790"
+  }
+},
+{
+  "type": "node",
+  "id": 3101466187,
+  "lat": 13.9023442,
+  "lon": 100.4718971,
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดแสงสิริธรรม",
+    "name:en": "Wat Saeng Siritham",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 194521680,
+  "center": {
+    "lat": 13.9127076,
+    "lon": 100.4899870
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดปรมัยยิกาวาส",
+    "name:en": "Wat Pora Mai Yi Ka Wat",
+    "name:th": "วัดปรมัยยิกาวาส",
+    "religion": "buddhist",
+    "tourism": "attraction",
+    "wikidata": "Q2552310",
+    "wikimedia_commons": "Category:Wat Paramai Yikawat",
+    "wikipedia": "en:Wat Paramaiyikawat"
+  }
+},
+{
+  "type": "way",
+  "id": 200581824,
+  "center": {
+    "lat": 13.9004395,
+    "lon": 100.4756037
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "muslim"
+  }
+},
+{
+  "type": "way",
+  "id": 200582178,
+  "center": {
+    "lat": 13.9021355,
+    "lon": 100.4718089
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดแสงสิริธรรม",
+    "name:en": "Wat Saeng Siritham",
+    "name:th": "วัดแสงสิริธรรม",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 376466921,
+  "center": {
+    "lat": 13.9178073,
+    "lon": 100.4853518
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "Wat Baan Jaak",
+    "name:th": "วัดบางจาก",
+    "religion": "buddhist",
+    "wikidata": "Q36449174"
+  }
+},
+{
+  "type": "way",
+  "id": 376466927,
+  "center": {
+    "lat": 13.9137427,
+    "lon": 100.4829717
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดเสาธงทอง",
+    "name:en": "Wat Sao Thong Thong",
+    "religion": "buddhist",
+    "wikidata": "Q60661528",
+    "wikimedia_commons": "Category:Wat Sao Thong Thong, Nonthaburi"
+  }
+},
+{
+  "type": "way",
+  "id": 376466928,
+  "center": {
+    "lat": 13.9126822,
+    "lon": 100.4858138
+  },
+  "tags": {
+    "addr:district": "ปากเกร็ด",
+    "addr:place": "บ้านโอ่งอ่าง",
+    "addr:postcode": "11120",
+    "addr:province": "นนทบุรี",
+    "addr:subdistrict": "เกาะเกร็ด",
+    "amenity": "place_of_worship",
+    "check_date": "2024-11-10",
+    "name": "วัดไผ่ล้อม",
+    "name:en": "Wat Phai Lom",
+    "religion": "buddhist",
+    "wikidata": "Q99642791"
+  }
+},
+{
+  "type": "way",
+  "id": 376679554,
+  "center": {
+    "lat": 13.9062701,
+    "lon": 100.4898278
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "วัดฉิมพลีสุทธาวาส",
+    "name:en": "Wat Chimphli Sutthawat",
+    "religion": "buddhist",
+    "wikidata": "Q63533717",
+    "wikimedia_commons": "Category:Wat Chimphli Sutthawat, Nonthaburi"
+  }
+},
+{
+  "type": "way",
+  "id": 1154006236,
+  "center": {
+    "lat": 13.9126353,
+    "lon": 100.4900203
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1154006241,
+  "center": {
+    "lat": 13.9062518,
+    "lon": 100.4897625
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1154006242,
+  "center": {
+    "lat": 13.9064672,
+    "lon": 100.4899350
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1154377946,
+  "center": {
+    "lat": 13.9137458,
+    "lon": 100.4834062
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1154505772,
+  "center": {
+    "lat": 13.9126385,
+    "lon": 100.4897403
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "religion": "buddhist"
+  }
+},
+{
+  "type": "way",
+  "id": 1184261576,
+  "center": {
+    "lat": 13.9129732,
+    "lon": 100.4736651
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "name": "วัดจันทร์",
+    "name:en": "Wat Chan",
+    "name:th": "วัดจันทร์",
+    "religion": "buddhist"
+  }
+}
+
+  ]
+}

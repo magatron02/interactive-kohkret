@@ -101,26 +101,42 @@ body {
   background-image: url("/pattern-kiln-lids.webp");
   background-size: cover;
   background-position: center 30%;
-  opacity: 0.16;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgb(0 0 0 / 0.35) 22%,
-    rgb(0 0 0 / 0.9) 60%,
-    rgb(0 0 0 / 0.55) 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgb(0 0 0 / 0.35) 22%,
-    rgb(0 0 0 / 0.9) 60%,
-    rgb(0 0 0 / 0.55) 100%
-  );
+  opacity: 0.18;
+  /*
+    Reflected horizontally: strongest at the two outer edges, gone by the middle. The content column
+    runs down the centre, so the pattern lives in the margins the layout does not use and never sits
+    behind text. A second, vertical mask keeps it off the header.
+  */
+  -webkit-mask-image:
+    linear-gradient(to right, #000 0%, rgb(0 0 0 / 0.25) 26%, transparent 44%, transparent 56%, rgb(0 0 0 / 0.25) 74%, #000 100%),
+    linear-gradient(to bottom, transparent 0%, rgb(0 0 0 / 0.5) 12%, #000 40%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, #000 0%, rgb(0 0 0 / 0.25) 26%, transparent 44%, transparent 56%, rgb(0 0 0 / 0.25) 74%, #000 100%),
+    linear-gradient(to bottom, transparent 0%, rgb(0 0 0 / 0.5) 12%, #000 40%);
+  mask-composite: intersect;
   pointer-events: none;
 }
 @media (prefers-reduced-transparency: reduce) {
   .page-backdrop {
     display: none;
+  }
+}
+
+/*
+  The two panels the pattern would otherwise show through. They sit at the outer edges, exactly where
+  the backdrop is strongest, so they carry their own ground rather than relying on the mask to miss
+  them. Hairline and radius keep them reading as part of the same flat system, not as floating cards.
+*/
+.panel-surface {
+  background-color: var(--color-bg-deep);
+  border-radius: 0.75rem;
+}
+@media (min-width: 64rem) {
+  .panel-surface {
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--color-hairline);
+    background-color: color-mix(in srgb, var(--color-bg-panel) 92%, transparent);
   }
 }
 
