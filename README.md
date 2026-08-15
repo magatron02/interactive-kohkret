@@ -87,8 +87,12 @@ node scripts/check-contrast.mjs        # verify every colour pairing
 1. หาพิกัดจริง — จาก OpenStreetMap หรือหมุด Google Maps ของร้านเอง (คลี่ short link แล้วอ่าน `!3d<lat>!4d<lng>`)
 2. เช็คว่าพิกัดอยู่บนเกาะจริง (`scripts/build-map-data.mjs` มีฟังก์ชัน point-in-polygon)
 3. เพิ่มใน `lib/places.ts` (ใส่แค่ `lat`/`lng` — ตำแหน่งบนจอคำนวณจาก `project()` ให้เอง)
-4. ถ้าอยู่ในเส้นทางไหน เพิ่ม `stops` ในเส้นทางนั้น แล้วรัน `optimise-route-order.mjs` เพื่อหาลำดับที่เดินซ้ำน้อยที่สุด
+4. ถ้าอยู่ในเส้นทางไหน เพิ่มใน `stops` ของเส้นทางนั้นใน `lib/places.ts` ไฟล์เดียว
+   แล้วรัน `optimise-route-order.mjs` เพื่อหาลำดับที่เดินซ้ำน้อยที่สุด
 5. รัน `build-map-data.mjs` เพื่อ regenerate เส้นทาง
+
+> script ทั้งสองตัว `import` `lib/places.ts` โดยตรง (Node strip TypeScript ให้เอง) จึงไม่มีรายชื่อสถานที่
+> หรือลำดับเส้นทางเก็บซ้ำไว้ที่อื่นให้หลุดจากกัน
 
 ### ดึงข้อมูล OSM ใหม่
 

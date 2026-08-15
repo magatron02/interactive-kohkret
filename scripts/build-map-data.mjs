@@ -5,6 +5,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const HERE = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const DIR = process.argv[2] ?? path.join(HERE, 'osm-cache');
@@ -174,26 +175,13 @@ for (const start of nodes.keys()) {
 const biggest = compSize.indexOf(Math.max(...compSize));
 console.log(`graph: ${nodes.size} nodes, ${welds} welds -> ${compCount} component(s), largest ${compSize[biggest]}`);
 
-const PLACES = [
-  ['wat-pai-lom', 13.91268, 100.48581], ['wat-poramaiyikawat', 13.91271, 100.48999],
-  ['wat-sao-thong-thong', 13.91374, 100.48297], ['wat-chan', 13.91297, 100.47367],
-  ['wat-sala-kun', 13.90642, 100.48316], ['wat-chimphli-sutthawat', 13.90627, 100.48983],
-  ['hom-fung-pang-nom', 13.91338, 100.4871], ['baan-rim-nam-home-cafe', 13.91135, 100.49097],
-  ['raan-me-rak', 13.91101, 100.49103], ['riva-eatery-bar', 13.91162, 100.46739],
-  ['baan-rim-nam', 13.91114, 100.49102], ['delicious-thai-food', 13.91049, 100.49096],
-  ['baanya-homestay', 13.9027, 100.48945], ['pa-tum-pottery', 13.9131, 100.48525],
-  ['tha-wat-poramaiyikawat', 13.91269, 100.49069], ['tha-pa-fai', 13.90466, 100.49031],
-  ['rangnok-cafe', 13.916073, 100.4772542], ['tiao-ing-nam', 13.9132835, 100.4881363],
-  ['rorsor-127', 13.9114663, 100.4674511],
-];
-const ROUTES = {
-  'full-day': ['tha-wat-poramaiyikawat','wat-poramaiyikawat','wat-pai-lom','wat-sao-thong-thong','pa-tum-pottery','wat-sala-kun','wat-chimphli-sutthawat','raan-me-rak','baan-rim-nam','tha-wat-poramaiyikawat'],
-  temple: ['wat-chan','wat-sao-thong-thong','wat-pai-lom','wat-poramaiyikawat','wat-chimphli-sutthawat','wat-sala-kun'],
-  cafe: ['rangnok-cafe','hom-fung-pang-nom','baan-rim-nam-home-cafe','raan-me-rak'],
-  food: ['rorsor-127','riva-eatery-bar','tiao-ing-nam','baan-rim-nam','delicious-thai-food'],
-  pottery: ['wat-pai-lom','pa-tum-pottery','wat-poramaiyikawat'],
-  boat: ['wat-poramaiyikawat','tha-wat-poramaiyikawat','tha-pa-fai','baanya-homestay'],
-};
+// Places and route order come straight from lib/places.ts — the one file a human edits. Node
+// strips the TypeScript natively, so there is no second copy of this list to drift out of sync.
+const { PLACES: SRC_PLACES, ROUTES: SRC_ROUTES } = await import(
+  pathToFileURL(path.join(HERE, '..', 'lib', 'places.ts')).href
+);
+const PLACES = SRC_PLACES.map((p) => [p.id, p.lat, p.lng]);
+const ROUTES = Object.fromEntries(SRC_ROUTES.map((r) => [r.id, r.stops.map((s) => s.placeId)]));
 
 const snapped = new Map();
 for (const [id, lat, lon] of PLACES) {

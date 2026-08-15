@@ -1,0 +1,75 @@
+{
+ "full-day": {
+  "order": [
+   "tha-wat-poramaiyikawat",
+   "baan-rim-nam",
+   "raan-me-rak",
+   "wat-chimphli-sutthawat",
+   "wat-sala-kun",
+   "wat-sao-thong-thong",
+   "pa-tum-pottery",
+   "wat-pai-lom",
+   "wat-poramaiyikawat"
+  ],
+  "loop": true,
+  "metres": 5561,
+  "repeat": 1112
+ },
+ "temple": {
+  "order": [
+   "wat-chan",
+   "wat-sao-thong-thong",
+   "wat-pai-lom",
+   "wat-poramaiyikawat",
+   "wat-chimphli-sutthawat",
+   "wat-sala-kun"
+  ],
+  "loop": false,
+  "metres": 4217,
+  "repeat": 98
+ },
+ "cafe": {
+  "order": [
+   "rangnok-cafe",
+   "hom-fung-pang-nom",
+   "baan-rim-nam-home-cafe",
+   "raan-me-rak"
+  ],
+  "loop": false,
+  "metres": 1911,
+  "repeat": 0
+ },
+ "food": {
+  "order": [
+   "rorsor-127",
+   "riva-eatery-bar",
+   "tiao-ing-nam",
+   "baan-rim-nam",
+   "delicious-thai-food"
+  ],
+  "loop": false,
+  "metres": 2858,
+  "repeat": 0
+ },
+ "pottery": {
+  "order": [
+   "wat-pai-lom",
+   "pa-tum-pottery",
+   "wat-poramaiyikawat"
+  ],
+  "loop": false,
+  "metres": 736,
+  "repeat": 90
+ },
+ "boat": {
+  "order": [
+   "baanya-homestay",
+   "tha-pa-fai",
+   "tha-wat-poramaiyikawat",
+   "wat-poramaiyikawat"
+  ],
+  "loop": false,
+  "metres": 1477,
+  "repeat": 36
+ }
+}
