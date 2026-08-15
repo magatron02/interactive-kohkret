@@ -1,4 +1,5 @@
 import { getCategory, type Place } from "@/lib/places";
+import { directionsLink, placeLink } from "@/lib/maps-links";
 import { Icon } from "@/lib/icons";
 
 export default function PlacePopup({
@@ -83,6 +84,28 @@ export default function PlacePopup({
           </dd>
         </div>
       </dl>
+
+      {/* Hands the visitor off to whatever map app they already have, once they stop planning and
+          start walking. Plain URLs — no Google API key, no billing, no third-party script. */}
+      <div className="mt-3 flex gap-2">
+        <a
+          href={directionsLink(place)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 text-[13px] font-semibold text-[var(--color-bg-deep)] transition-opacity duration-150 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-elevated)]"
+        >
+          <Icon name="route" className="h-4 w-4" strokeWidth={1.8} />
+          นำทางไปที่นี่
+        </a>
+        <a
+          href={placeLink(place)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--color-hairline)] px-3 text-[13px] text-[var(--color-ink-muted)] transition-colors duration-150 hover:border-[var(--color-ink-faint)] hover:text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-elevated)]"
+        >
+          ดูบนแผนที่
+        </a>
+      </div>
 
       {(place.phone || place.website) && (
         <div className="mt-2 flex flex-wrap gap-x-4">
