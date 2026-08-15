@@ -7,10 +7,10 @@ import { Icon } from "@/lib/icons";
  */
 export default function SiteFooter() {
   return (
-    <footer className="mt-8 border-t border-[var(--color-hairline)] pt-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <footer className="mt-auto border-t border-[var(--color-hairline)] pt-3.5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Icon name="brand-chedi" className="h-9 w-9 shrink-0 text-[var(--color-ink-muted)]" strokeWidth={1.3} />
+          <Icon name="brand-chedi" className="h-8 w-8 shrink-0 text-[var(--color-ink-muted)]" strokeWidth={1.3} />
           <div>
             <p className="text-[13px] font-medium text-[var(--color-ink)]">
               องค์การบริหารส่วนตำบลเกาะเกร็ด จังหวัดนนทบุรี
@@ -32,8 +32,8 @@ export default function SiteFooter() {
         </a>
       </div>
 
-      <p className="mt-4 text-[11px] leading-relaxed text-[var(--color-ink-faint)]">
-        ชายฝั่ง โครงข่ายถนน และพิกัดสถานที่ทั้งหมดมาจาก OpenStreetMap — ข้อมูล ©{" "}
+      <p className="mt-2 text-[10px] leading-snug text-[var(--color-ink-faint)]">
+        ชายฝั่ง แม่น้ำ โครงข่ายถนน และพิกัดสถานที่มาจาก OpenStreetMap — ข้อมูล ©{" "}
         <a
           href="https://www.openstreetmap.org/copyright"
           target="_blank"

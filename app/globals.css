@@ -20,11 +20,21 @@
   --color-hairline: #22334f; /* the only divider treatment in the system */
 
   /* The island itself sits a step above the water, the way a chart separates land from sea. */
-  --color-land: #16223a;
-  --color-land-edge: #35507d;
+  /*
+    Three surfaces have to be told apart at a glance or the island stops being an island. Measured,
+    not eyeballed: island/water 1.64:1 and island/mainland 1.49:1, both past the ~1.45 where a shape
+    starts reading on its own. An earlier pass had island/water at 1.10 and the island simply vanished.
+    Order of lightness is island (the subject) > mainland (context) > water (deepest).
+  */
+  --color-land: #22395c;
+  --color-land-edge: #6f9bd6;
   --color-map-glow: #16304f;
-  --color-road-major: #4a6a99;
-  --color-road-minor: #2e4569;
+  --color-mainland: #0e1b2c;
+  --color-context-road: #24374f;
+  --color-water: #06101f;
+  /* Lighter than the land they cross, the way a chart engraves streets into the landmass. */
+  --color-road-major: #8fb0d6;
+  --color-road-minor: #52719e;
 
   /* Text — ink 17.26:1, muted 10.12:1, faint 7.28:1 on --color-bg-deep */
   --color-ink: #f2f6fc;
@@ -124,6 +134,22 @@ body {
 
 /* ---------------------------------------------------------------- map layers */
 
+/* Pak Kret on both banks. The river is painted over this, so land is the ground plane. */
+.mainland {
+  fill: var(--color-mainland);
+}
+.context-roads path {
+  fill: none;
+  stroke: var(--color-context-road);
+  stroke-width: 0.28;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+.water path {
+  fill: var(--color-water);
+  stroke: none;
+}
+
 .island-land {
   fill: var(--color-land);
 }
@@ -131,7 +157,7 @@ body {
 .island-edge {
   fill: none;
   stroke: var(--color-land-edge);
-  stroke-width: 0.5;
+  stroke-width: 0.6;
   /* Base state is a complete outline. The draw-on lives entirely in the keyframes, so if the animation
      never runs (reduced motion, a headless render, a background tab) the coastline is still there. */
   animation: coast-draw 900ms var(--ease-out-expo);
@@ -206,51 +232,81 @@ body {
 
 /* ---------------------------------------------------------------- pins */
 
+/*
+  A map pin, not a dot: a rounded head with a stem whose point is the anchor. `translate(-50%, -100%)`
+  puts that point exactly on the projected coordinate, so the pin keeps its place through any resize
+  or browser zoom — the geometry scales, the pin does not, and the tip stays on the spot it marks.
+
+  Pins are NOT displaced to avoid each other. Nearby places genuinely sit close together on this island,
+  and moving a marker to make it tidier is a small lie about where something is. They overlap instead,
+  ordered by latitude the way a paper map stacks them, and hover or selection lifts one clear.
+*/
 .map-pin {
   position: absolute;
-  display: grid;
-  place-items: center;
   width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 9999px;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+  height: 2.35rem;
+  transform: translate(-50%, -100%);
+  transform-origin: 50% 100%;
   transition:
-    width 150ms var(--ease-out-expo),
-    height 150ms var(--ease-out-expo),
     opacity 250ms var(--ease-out-expo),
-    box-shadow 150ms var(--ease-out-expo);
-  z-index: 10;
+    transform 150ms var(--ease-out-expo),
+    filter 250ms var(--ease-out-expo);
+  animation: pin-drop 420ms var(--ease-out-expo) both;
 }
 /* Keeps the visible pin small while giving it a 44px touch target outdoors. */
 .map-pin::before {
   content: "";
   position: absolute;
-  inset: -0.5rem;
-  border-radius: inherit;
+  inset: -0.45rem -0.5rem;
+}
+.map-pin__body {
+  position: absolute;
+  inset: 0 0 auto 0;
+  display: grid;
+  height: 1.75rem;
+  place-items: center;
+  border: 2px solid var(--color-bg-map);
+  border-radius: 9999px 9999px 9999px 9999px;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 0.55);
+}
+/* The stem is a triangle built from borders, so it always matches the head's colour exactly. */
+.map-pin__stem {
+  position: absolute;
+  bottom: 0.05rem;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 0.3rem solid transparent;
+  border-right: 0.3rem solid transparent;
+  border-top: 0.62rem solid currentColor;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.5));
 }
 @media (hover: hover) {
   .map-pin:hover {
-    transform: translate(-50%, -50%) scale(1.12);
-    z-index: 15;
+    transform: translate(-50%, -100%) scale(1.12);
+    z-index: 45 !important;
   }
 }
 .map-pin:focus-visible {
+  outline: none;
+  z-index: 50 !important;
+}
+.map-pin:focus-visible .map-pin__body {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-  z-index: 25;
 }
-.map-pin--selected {
-  width: 2.25rem;
-  height: 2.25rem;
+.map-pin--selected .map-pin__body {
   box-shadow:
     0 0 0 2px var(--color-primary),
-    0 4px 14px rgb(0 0 0 / 0.55);
-  z-index: 20;
+    0 4px 14px rgb(0 0 0 / 0.6);
+}
+.map-pin--selected {
+  transform: translate(-50%, -100%) scale(1.15);
 }
 .map-pin--dim {
   opacity: 0.4;
-  filter: saturate(0.55);
+  filter: saturate(0.5);
 }
 
 /* ---------------------------------------------------------------- motion */
@@ -277,19 +333,23 @@ body {
   }
 }
 
-/* The stagger delay states visiting order — the one stagger in this app that carries information. */
-@keyframes stagger-in {
-  from {
+/*
+  Pins fall onto the map when a category is switched on. The stagger is not decoration: markers arriving
+  one after another is what tells you a filter just ran and how much it turned up. It lands from above
+  and settles, because that is what "dropping a pin" means.
+*/
+@keyframes pin-drop {
+  0% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.6);
+    transform: translate(-50%, -100%) translateY(-14px) scale(0.85);
   }
-  to {
+  60% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
   }
-}
-.map-pin.stagger-in {
-  animation: stagger-in 200ms var(--ease-out-expo) both;
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -100%) translateY(0) scale(1);
+  }
 }
 
 @keyframes card-in {
@@ -302,7 +362,7 @@ body {
     transform: none;
   }
 }
-.stagger-in:not(.map-pin) {
+.stagger-in {
   animation: card-in 250ms var(--ease-out-expo) both;
 }
 
@@ -342,16 +402,19 @@ body {
   .island-edge,
   .route-line--core,
   .route-line--glow,
-  .map-pin.stagger-in,
-  .stagger-in:not(.map-pin),
+  .map-pin,
+  .stagger-in,
   .popup-enter {
     animation: none;
   }
-  .map-pin.stagger-in {
+  .map-pin {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -100%);
   }
-  .stagger-in:not(.map-pin) {
+  .map-pin--selected {
+    transform: translate(-50%, -100%) scale(1.15);
+  }
+  .stagger-in {
     opacity: 1;
     transform: none;
   }
@@ -361,7 +424,7 @@ body {
   }
   @media (hover: hover) {
     .map-pin:hover {
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -100%);
     }
   }
   *,

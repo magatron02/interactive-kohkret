@@ -59,9 +59,14 @@ export default function Home() {
     setSelectedPlaceId(id);
   }
 
+  // "Show me the island" is the resting state. Pins appear once the visitor asks for something —
+  // a category, a search, or a route — so an unfiltered map is a map, not nineteen markers.
+  const hasSelection = activeCategories.size > 0 || searchQuery.trim().length > 0 || activeRoute !== null;
+  const pinnedPlaces = hasSelection ? visiblePlaces : [];
+
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      <header className="mb-6 lg:mb-8">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[1400px] flex-col px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
+      <header className="mb-4 lg:mb-5">
         <BrandLockup />
       </header>
 
@@ -79,10 +84,11 @@ export default function Home() {
         <div className="region-main min-w-0">
           <div className="relative">
             <MapCanvas
-              visiblePlaces={visiblePlaces}
+              visiblePlaces={pinnedPlaces}
               activeRoute={activeRoute}
               selectedPlaceId={selectedPlaceId}
               onSelectPlace={selectPlace}
+              hasSelection={hasSelection}
             />
             {selectedPlace && (
               <PlacePopup
@@ -93,7 +99,8 @@ export default function Home() {
             )}
           </div>
 
-          <div className="mt-6 border-t border-[var(--color-hairline)] pt-5">
+          {/* Sits directly under the map: picking a route is the next thing you do after looking at it. */}
+          <div className="mt-4 border-t border-[var(--color-hairline)] pt-3.5">
             <RouteLegend activeRouteId={selectedRouteId} onSelect={setSelectedRouteId} />
           </div>
 

@@ -2,8 +2,12 @@
 //
 // Coordinates come from OpenStreetMap via the Overpass API (nwr[amenity|tourism|shop|craft|historic]
 // inside the island bbox), filtered to points that fall inside the real coastline polygon — with a 60 m
-// shoreline buffer so the ferry piers, which sit just off the bank, survive. mapX/mapY are those same
-// lat/lng projected into the SVG space defined in lib/geo.ts, so a pin lands where the place really is.
+// shoreline buffer so the ferry piers, which sit just off the bank, survive. Three places absent from
+// OSM carry coordinates recovered from their own published map pins, each checked against the polygon.
+//
+// A place stores ONLY its real lat/lng. Screen position comes from project() in lib/geo.ts, the same
+// projection the coastline, water and streets use, so a pin cannot drift out of step with the map
+// under it — and re-framing the map never means hand-editing nineteen pairs of numbers again.
 //
 // Descriptions are drawn from Thai Wikipedia, อบต.เกาะเกร็ด, dooasia and touronthai. Where no sourced
 // description exists, `description` is omitted rather than invented — the UI renders that state honestly.
@@ -45,9 +49,6 @@ export type Place = {
   /** Real WGS84 coordinates from OpenStreetMap. */
   lat: number;
   lng: number;
-  /** The same point projected into lib/geo.ts's 135x100 SVG space. */
-  mapX: number;
-  mapY: number;
   /** Omitted when no sourced description exists. Never invented. */
   description?: string;
   /** Omitted when the place does not publish hours. */
@@ -76,8 +77,6 @@ export const PLACES: Place[] = [
     category: "temple",
     lat: 13.91268,
     lng: 100.48581,
-    mapX: 102.4,
-    mapY: 32,
     description:
       "วัดสมัยอยุธยาตอนปลาย ริมแม่น้ำด้านเหนือของเกาะ ร้างไปเมื่อ พ.ศ. 2308 ครั้งพม่าตีเมืองนนทบุรี อุโบสถงดงามด้วยหน้าบันจำหลักไม้ลายดอกไม้ คันทวยและบัวหัวเสา",
   },
@@ -88,8 +87,6 @@ export const PLACES: Place[] = [
     category: "temple",
     lat: 13.91271,
     lng: 100.48999,
-    mapX: 123.9,
-    mapY: 31.9,
     description:
       "พระอารามหลวง สัญลักษณ์ของเกาะคือเจดีย์มุเตา เจดีย์ทรงมอญที่เอียงเพราะกระแสน้ำกัดเซาะฐาน รัชกาลที่ 5 โปรดให้บูรณะทั้งวัดโดยรักษาแบบมอญไว้",
   },
@@ -100,8 +97,6 @@ export const PLACES: Place[] = [
     category: "temple",
     lat: 13.91374,
     lng: 100.48297,
-    mapX: 87.7,
-    mapY: 26.5,
     description:
       "วัดโบราณสมัยอยุธยา เดิมชื่อวัดสวนหมาก มีเจดีย์ทรงลูกฟักหนึ่งเดียวในไทย เจดีย์สูงที่สุดในอำเภอ และต้นโพธิ์อายุกว่า 200 ปี",
   },
@@ -112,8 +107,6 @@ export const PLACES: Place[] = [
     category: "temple",
     lat: 13.91297,
     lng: 100.47367,
-    mapX: 39.5,
-    mapY: 30.5,
     // Every other temple here carries a Wikidata id and a secondary source. This one has neither: it is a
     // lone OSM building (way/1184261576) with a name and nothing else, and the Thai Wikipedia article on
     // เกาะเกร็ด does not list it. The วัดจันทร์ that Wikipedia does document is in บางกรวย, a different
@@ -127,8 +120,6 @@ export const PLACES: Place[] = [
     category: "temple",
     lat: 13.90642,
     lng: 100.48316,
-    mapX: 88.7,
-    mapY: 64.4,
     description:
       "ตั้งอยู่เกือบกลางเกาะ สร้างสมัยธนบุรีโดยเจ้าพระยารัตนาธิเบศน์ (กุน) เป็นวัดไทยวัดเดียวในตำบลเกาะเกร็ด มีชื่อเรื่องหนุมานหลวงปู่สุ่น",
   },
@@ -139,8 +130,6 @@ export const PLACES: Place[] = [
     category: "temple",
     lat: 13.90627,
     lng: 100.48983,
-    mapX: 123.1,
-    mapY: 65.2,
     description:
       "วัดราษฎร์บ้านลัดเกร็ด อุโบสถขนาดเล็กที่ยังสมบูรณ์ตามแบบดั้งเดิม ซุ้มประตูทรงมณฑป ซุ้มหน้าต่างแบบหน้านาง",
   },
@@ -151,8 +140,6 @@ export const PLACES: Place[] = [
     category: "cafe",
     lat: 13.91338,
     lng: 100.4871,
-    mapX: 109,
-    mapY: 28.4,
     hours: "10:00–16:00",
     cuisine: ["ร้านกาแฟ", "ของหวาน", "เค้ก"],
     phone: "0967943836",
@@ -164,8 +151,6 @@ export const PLACES: Place[] = [
     category: "cafe",
     lat: 13.91135,
     lng: 100.49097,
-    mapX: 129,
-    mapY: 38.9,
     // Verbatim from the OSM `description` tag on node/10902425966.
     description:
       "บ้านริมน้ำบนเกาะเกร็ด นั่งชิลชิลชมวิวเจ้าพระยา กับกาแฟ เครื่องดื่มและของหวานอร่อยๆ ชิคๆ ชิลๆ",
@@ -182,8 +167,6 @@ export const PLACES: Place[] = [
     category: "cafe",
     lat: 13.91101,
     lng: 100.49103,
-    mapX: 129.3,
-    mapY: 40.7,
     cuisine: ["ร้านกาแฟ", "อาหารไทย"],
     phone: "0918852408",
     website: "https://www.facebook.com/Ranmeeruk/?locale=th_TH",
@@ -200,8 +183,6 @@ export const PLACES: Place[] = [
     category: "cafe",
     lat: 13.916073,
     lng: 100.4772542,
-    mapX: 58.1,
-    mapY: 14.5,
     description: "คาเฟ่ริมแม่น้ำตกแต่งสไตล์บาหลี มีมุมรังนกสำหรับถ่ายรูป เปิดถึงเที่ยงคืน",
     hours: "ทุกวัน 11:00–24:00",
     phone: "02 036 7865",
@@ -213,8 +194,6 @@ export const PLACES: Place[] = [
     category: "restaurant",
     lat: 13.91162,
     lng: 100.46739,
-    mapX: 7.1,
-    mapY: 37.5,
     description: "อยู่ปลายเกาะฝั่งตะวันตก ห่างจากทางเดินสายหลักที่สุดในบรรดาร้านบนเกาะ",
     dataNote: "ที่อยู่ตรงกับ ร.ศ.๑๒๗ ในข้าวมีคำ (40 หมู่ 4) และหมุดห่างกัน 18 ม. อาจเป็นบริเวณเดียวกัน",
   },
@@ -224,8 +203,6 @@ export const PLACES: Place[] = [
     category: "restaurant",
     lat: 13.91114,
     lng: 100.49102,
-    mapX: 129.3,
-    mapY: 40,
   },
   {
     id: "delicious-thai-food",
@@ -233,8 +210,6 @@ export const PLACES: Place[] = [
     category: "restaurant",
     lat: 13.91049,
     lng: 100.49096,
-    mapX: 129,
-    mapY: 43.3,
     cuisine: ["อาหารไทย"],
   },
   {
@@ -244,8 +219,6 @@ export const PLACES: Place[] = [
     category: "restaurant",
     lat: 13.9132835,
     lng: 100.4881363,
-    mapX: 114.4,
-    mapY: 28.9,
     description: "ร้านก๋วยเตี๋ยวริมน้ำ ตกแต่งแบบไทยโบราณผสมสมัยใหม่",
     hours: "09:30–17:00 (ปิดวันจันทร์)",
     cuisine: ["ก๋วยเตี๋ยว"],
@@ -259,8 +232,6 @@ export const PLACES: Place[] = [
     category: "restaurant",
     lat: 13.9114663,
     lng: 100.4674511,
-    mapX: 7.4,
-    mapY: 38.3,
     description:
       "อาหารไทยในเรือนไม้อายุกว่าร้อยปีริมน้ำ ชื่อร้านมาจากโฉนดที่ดินที่ออกในปี ร.ศ. 127 (พ.ศ. 2451) เข้าถึงโดยเรือจากท่าน้ำวัดใหญ่สว่างอารมณ์",
     cuisine: ["อาหารไทย"],
@@ -278,8 +249,6 @@ export const PLACES: Place[] = [
     category: "homestay",
     lat: 13.9027,
     lng: 100.48945,
-    mapX: 121.2,
-    mapY: 83.6,
     description: "ที่พักแห่งเดียวบนเกาะที่ปรากฏใน OpenStreetMap อยู่ทางใต้ของเกาะใกล้ท่าเรือป่าฝ้าย",
   },
 
@@ -290,8 +259,6 @@ export const PLACES: Place[] = [
     category: "craft",
     lat: 13.9131,
     lng: 100.48525,
-    mapX: 99.5,
-    mapY: 29.9,
     description: "แหล่งเรียนรู้เครื่องปั้นดินเผามอญ สืบทอดฝีมือและภูมิปัญญาท้องถิ่นมาถึงรุ่นที่ 5",
     hours: "ทุกวัน 09:00–17:00",
   },
@@ -303,8 +270,6 @@ export const PLACES: Place[] = [
     category: "pier",
     lat: 13.91269,
     lng: 100.49069,
-    mapX: 127.6,
-    mapY: 32,
     description: "ท่าเรือหลักของเกาะ ข้ามฟากจากท่าน้ำวัดสนามเหนือฝั่งปากเกร็ด ค่าโดยสาร 3–5 บาท",
   },
   {
@@ -314,8 +279,6 @@ export const PLACES: Place[] = [
     category: "pier",
     lat: 13.90466,
     lng: 100.49031,
-    mapX: 125.6,
-    mapY: 73.5,
     description: "ท่าเรือข้ามฟากทางใต้ของเกาะ ขึ้นทะเบียนเป็นสถานีขนส่งสาธารณะใน OpenStreetMap",
   },
 ];

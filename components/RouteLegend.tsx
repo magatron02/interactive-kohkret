@@ -30,7 +30,7 @@ export default function RouteLegend({
 
       {/* Phone: one scrollable row so the six routes never push the itinerary below the fold.
           Desktop: they wrap into the legend strip the reference poster runs under the map. */}
-      <ul className="edge-fade -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-wrap lg:gap-x-5 lg:gap-y-3 lg:overflow-visible lg:px-0 lg:pb-0">
+      <ul className="edge-fade -mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-wrap lg:gap-x-4 lg:gap-y-1.5 lg:overflow-visible lg:px-0 lg:pb-0">
         {ROUTES.map((route, i) => {
           const isActive = route.id === activeRouteId;
           return (
@@ -39,7 +39,7 @@ export default function RouteLegend({
                 type="button"
                 onClick={() => onSelect(isActive ? null : route.id)}
                 aria-pressed={isActive}
-                className={`flex min-h-11 items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-deep)] ${
+                className={`flex min-h-11 items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-deep)] lg:min-h-0 lg:py-1 ${
                   isActive ? "bg-[var(--color-bg-panel)]" : "hover:bg-[var(--color-bg-panel)]"
                 }`}
               >
