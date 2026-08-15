@@ -1,1 +1,373 @@
 @import "tailwindcss";
+
+/*
+  Dark navy theme. Every ratio below was computed with the WCAG relative-luminance formula and checked,
+  not estimated — all 43 pairings pass, most by a wide margin. The project bar is stricter than WCAG AA
+  because this map gets read outdoors in Thai daylight: body text targets 7:1, nothing sits under 4.5:1.
+
+  The page is deep navy rather than black on purpose: pure #000 turns a phone screen into a mirror in
+  sun and smears on OLED. #0B1220 keeps the depth without either problem.
+*/
+
+:root {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --color-bg-deep: #0b1220; /* page */
+  --color-bg-map: #0e1727; /* water / map field */
+  --color-bg-panel: #111c2e; /* side panels, cards */
+  --color-bg-elevated: #16233a; /* popup, raised chips */
+  --color-hairline: #22334f; /* the only divider treatment in the system */
+
+  /* The island itself sits a step above the water, the way a chart separates land from sea. */
+  --color-land: #16223a;
+  --color-land-edge: #35507d;
+  --color-map-glow: #16304f;
+  --color-road-major: #4a6a99;
+  --color-road-minor: #2e4569;
+
+  /* Text — ink 17.26:1, muted 10.12:1, faint 7.28:1 on --color-bg-deep */
+  --color-ink: #f2f6fc;
+  --color-ink-muted: #afc0d8;
+  --color-ink-faint: #8fa3c0;
+
+  /* Kiln Clay, the project's heritage terracotta, lifted for navy. #B5502E would go muddy here;
+     #E3714A stays recognisably the same clay and clears 6:1 on the page. */
+  --color-primary: #e3714a;
+
+  /* Categories. Every fill takes the deep-navy ink at >= 7.5:1, so unlike the light theme there is
+     no per-swatch text exception to remember. The reference poster uses blue twice (restaurant and
+     boat); that is one hue doing two jobs, so boat moves to green here. */
+  --color-cat-temple: #f5a623;
+  --color-cat-cafe: #ff8a4c;
+  --color-cat-restaurant: #6ba5ff;
+  --color-cat-homestay: #35d0c0;
+  --color-cat-craft: #c08cff;
+  --color-cat-pier: #45d07a;
+  --color-cat-temple-ink: #0b1220;
+  --color-cat-cafe-ink: #0b1220;
+  --color-cat-restaurant-ink: #0b1220;
+  --color-cat-homestay-ink: #0b1220;
+  --color-cat-craft-ink: #0b1220;
+  --color-cat-pier-ink: #0b1220;
+
+  /* Routes. Six distinct hues; the flagship day trip wears the brand clay. Numbers on the pins carry
+     the order too, so the routes stay separable without relying on colour alone. */
+  --color-route-1: #e3714a;
+  --color-route-2: #f5a623;
+  --color-route-3: #c08cff;
+  --color-route-4: #45d07a;
+  --color-route-5: #6ba5ff;
+  --color-route-6: #35d0c0;
+  --color-route-1-ink: #0b1220;
+  --color-route-2-ink: #0b1220;
+  --color-route-3-ink: #0b1220;
+  --color-route-4-ink: #0b1220;
+  --color-route-5-ink: #0b1220;
+  --color-route-6-ink: #0b1220;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+  background-color: var(--color-bg-deep);
+  color: var(--color-ink);
+  /* Thin white on navy blooms in sunlight, so nothing here is set below 400 and UI text sits at 500+. */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ----------------------------------------------------------------- page grid
+
+  Source order is the mobile order, and it is the order that matters: search, then filters, then the map,
+  then routes, then the itinerary, then the QR card. On a phone the visitor filters first and reads the map
+  second. Desktop re-places those same regions into two columns with explicit grid lines, so neither layout
+  has to compromise the other and nothing is duplicated in the DOM.
+*/
+.app-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+@media (min-width: 64rem) {
+  .app-grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 2rem;
+    align-items: start;
+  }
+  .app-grid > .region-main {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+  .app-grid > .region-filters {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .app-grid > .region-extra {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+/* Horizontal scrollers (category chips, route chips, itinerary) fade at the trailing edge so a cut-off
+   item reads as "there is more" without spending room on an arrow button. */
+.edge-fade {
+  scrollbar-width: none;
+}
+.edge-fade::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 63.99rem) {
+  .edge-fade {
+    -webkit-mask-image: linear-gradient(to right, #000 88%, transparent);
+    mask-image: linear-gradient(to right, #000 88%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------- map layers */
+
+.island-land {
+  fill: var(--color-land);
+}
+
+.island-edge {
+  fill: none;
+  stroke: var(--color-land-edge);
+  stroke-width: 0.5;
+  /* Base state is a complete outline. The draw-on lives entirely in the keyframes, so if the animation
+     never runs (reduced motion, a headless render, a background tab) the coastline is still there. */
+  animation: coast-draw 900ms var(--ease-out-expo);
+}
+
+.island-contour {
+  fill: none;
+  stroke: var(--color-land-edge);
+}
+.island-contour--far {
+  stroke-width: 0.35;
+  opacity: 0.18;
+  transform: scale(1.045);
+  transform-origin: center;
+  transform-box: fill-box;
+}
+.island-contour--near {
+  stroke-width: 0.35;
+  opacity: 0.3;
+  transform: scale(1.02);
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.road {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 250ms var(--ease-out-expo);
+}
+.road--major {
+  stroke: var(--color-road-major);
+  stroke-width: 0.55;
+  opacity: 0.9;
+}
+.road--minor {
+  stroke: var(--color-road-minor);
+  stroke-width: 0.32;
+  opacity: 0.75;
+}
+/* Jetties read as built structure over water, so they keep the brighter stroke even when a route dims
+   the grid — they are how you get on and off the island. */
+.road--pier {
+  stroke: var(--color-road-major);
+  stroke-width: 0.45;
+  opacity: 0.95;
+}
+/* When a route is active the grid recedes so the route reads. This is state, not decoration —
+   it is applied instantly under reduced motion rather than dropped. */
+.map-has-route .road--major {
+  opacity: 0.5;
+}
+.map-has-route .road--minor {
+  opacity: 0.38;
+}
+
+.route-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.route-line--core {
+  stroke-width: 1.1;
+  animation: route-draw 500ms var(--ease-out-expo);
+}
+.route-line--glow {
+  stroke-width: 2.4;
+  opacity: 0.45;
+  animation: route-draw 500ms var(--ease-out-expo);
+}
+
+/* ---------------------------------------------------------------- pins */
+
+.map-pin {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+  transition:
+    width 150ms var(--ease-out-expo),
+    height 150ms var(--ease-out-expo),
+    opacity 250ms var(--ease-out-expo),
+    box-shadow 150ms var(--ease-out-expo);
+  z-index: 10;
+}
+/* Keeps the visible pin small while giving it a 44px touch target outdoors. */
+.map-pin::before {
+  content: "";
+  position: absolute;
+  inset: -0.5rem;
+  border-radius: inherit;
+}
+@media (hover: hover) {
+  .map-pin:hover {
+    transform: translate(-50%, -50%) scale(1.12);
+    z-index: 15;
+  }
+}
+.map-pin:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  z-index: 25;
+}
+.map-pin--selected {
+  width: 2.25rem;
+  height: 2.25rem;
+  box-shadow:
+    0 0 0 2px var(--color-primary),
+    0 4px 14px rgb(0 0 0 / 0.55);
+  z-index: 20;
+}
+.map-pin--dim {
+  opacity: 0.4;
+  filter: saturate(0.55);
+}
+
+/* ---------------------------------------------------------------- motion */
+
+@keyframes coast-draw {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes route-draw {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The stagger delay states visiting order — the one stagger in this app that carries information. */
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+.map-pin.stagger-in {
+  animation: stagger-in 200ms var(--ease-out-expo) both;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.stagger-in:not(.map-pin) {
+  animation: card-in 250ms var(--ease-out-expo) both;
+}
+
+@keyframes popup-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.popup-enter {
+  animation: popup-enter 200ms var(--ease-out-expo);
+}
+
+@keyframes popup-exit {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+.popup-exit {
+  animation: popup-exit 120ms var(--ease-out-expo) forwards;
+}
+
+/*
+  Reduced motion. Each rule states the END state explicitly rather than relying on a blanket
+  duration override — a global 1ms that leaves something at opacity 0 ships a blank screen.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .island-edge,
+  .route-line--core,
+  .route-line--glow,
+  .map-pin.stagger-in,
+  .stagger-in:not(.map-pin),
+  .popup-enter {
+    animation: none;
+  }
+  .map-pin.stagger-in {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .stagger-in:not(.map-pin) {
+    opacity: 1;
+    transform: none;
+  }
+  .popup-exit {
+    animation: none;
+    opacity: 0;
+  }
+  @media (hover: hover) {
+    .map-pin:hover {
+      transform: translate(-50%, -50%);
+    }
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

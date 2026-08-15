@@ -1,7 +1,112 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { PLACES, ROUTES, getPlace, type Category } from "@/lib/places";
+import BrandLockup from "@/components/BrandLockup";
+import MapCanvas from "@/components/MapCanvas";
+import CategoryPanel from "@/components/CategoryPanel";
+import SearchBar from "@/components/SearchBar";
+import PlacePopup from "@/components/PlacePopup";
+import RouteLegend from "@/components/RouteLegend";
+import ItineraryTimeline from "@/components/ItineraryTimeline";
+import VirtualTourCard from "@/components/VirtualTourCard";
+import SiteFooter from "@/components/SiteFooter";
+
 export default function Home() {
+  const [activeCategories, setActiveCategories] = useState<Set<Category>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const [closingPlaceId, setClosingPlaceId] = useState<string | null>(null);
+
+  const activeRoute = ROUTES.find((r) => r.id === selectedRouteId) ?? null;
+  const selectedPlace = selectedPlaceId ? (getPlace(selectedPlaceId) ?? null) : null;
+
+  const visiblePlaces = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    return PLACES.filter((p) => {
+      const matchesCategory = activeCategories.size === 0 || activeCategories.has(p.category);
+      const matchesSearch =
+        !query ||
+        p.name.toLowerCase().includes(query) ||
+        (p.nameEn?.toLowerCase().includes(query) ?? false);
+      return matchesCategory && matchesSearch;
+    });
+  }, [activeCategories, searchQuery]);
+
+  function toggleCategory(id: Category) {
+    setActiveCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function closePopup() {
+    if (!selectedPlaceId) return;
+    const closing = selectedPlaceId;
+    setClosingPlaceId(closing);
+    setTimeout(() => {
+      setSelectedPlaceId((current) => (current === closing ? null : current));
+      setClosingPlaceId((current) => (current === closing ? null : current));
+    }, 120);
+  }
+
+  // Choosing a stop from the itinerary should also open it on the map.
+  function selectPlace(id: string) {
+    setClosingPlaceId(null);
+    setSelectedPlaceId(id);
+  }
+
   return (
-    <main>
-      <div>Hello world!</div>
-    </main>
+    <div className="mx-auto min-h-dvh w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <header className="mb-6 lg:mb-8">
+        <BrandLockup />
+      </header>
+
+      <main className="app-grid">
+        {/* Filters come first in source: on a phone you narrow the map before you read it. */}
+        <div className="region-filters flex min-w-0 flex-col gap-4 lg:gap-6">
+          <SearchBar value={searchQuery} onChange={setSearchQuery} resultCount={visiblePlaces.length} />
+          <CategoryPanel
+            active={activeCategories}
+            onToggle={toggleCategory}
+            onClear={() => setActiveCategories(new Set())}
+          />
+        </div>
+
+        <div className="region-main min-w-0">
+          <div className="relative">
+            <MapCanvas
+              visiblePlaces={visiblePlaces}
+              activeRoute={activeRoute}
+              selectedPlaceId={selectedPlaceId}
+              onSelectPlace={selectPlace}
+            />
+            {selectedPlace && (
+              <PlacePopup
+                place={selectedPlace}
+                closing={closingPlaceId === selectedPlace.id}
+                onClose={closePopup}
+              />
+            )}
+          </div>
+
+          <div className="mt-6 border-t border-[var(--color-hairline)] pt-5">
+            <RouteLegend activeRouteId={selectedRouteId} onSelect={setSelectedRouteId} />
+          </div>
+
+          <ItineraryTimeline route={activeRoute} onSelectPlace={selectPlace} />
+        </div>
+
+        {/* Planning-at-home affordance, so it sits last on a phone and under the filters on desktop. */}
+        <div className="region-extra min-w-0">
+          <VirtualTourCard />
+        </div>
+      </main>
+
+      <SiteFooter />
+    </div>
   );
 }
