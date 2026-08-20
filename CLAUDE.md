@@ -79,8 +79,14 @@ and the route stop order exist once. Adding a stop to a route means editing `lib
 
 ```bash
 npm test          # 64 assertions over the data, routes, map frame, QR, both brand marks and the build
+npm run typecheck # next typegen && tsc --noEmit
 npm run shoot     # real full-resolution screenshots of eight states, into screenshots/
 ```
+
+Use `npm run typecheck`, not bare `tsc --noEmit`. `app/layout.tsx` uses Next 16's generated
+`LayoutProps<"/">`, which lives in `.next/types` — on a clone that has never built, bare `tsc` fails
+with "Cannot find name 'LayoutProps'". The script runs `next typegen` first, which produces those
+types without a full build.
 
 `npm test` is `node --test` against `tests/`, no framework and no dependency. It imports the TypeScript
 directly — Node strips the types. Every assertion in there exists because something was actually wrong:
@@ -88,7 +94,7 @@ the food route advertising a walking distance past two restaurants it never reac
 sideways on every wheel tick past the zoom limit, generated files naming a rebuild script that never
 shipped, a QR whose declared module count did not match the code.
 
-`npx tsc --noEmit` and `npm run build` are necessary but nowhere near sufficient — most defects found in
+`npm run typecheck` and `npm run build` are necessary but nowhere near sufficient — most defects found in
 this project were visual or behavioural and passed all three. Drive the running app and measure.
 
 Useful assertions, all of which caught real bugs here:

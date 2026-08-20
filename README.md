@@ -19,7 +19,8 @@ npm run dev
 เปิด http://localhost:3000
 
 ```bash
-npm test        # 64 assertions — ข้อมูล เส้นทาง QR และการ rebuild (node:test ไม่ต้องลง framework)
+npm test        # 64 assertions — ข้อมูล เส้นทาง QR โลโก้ และการ rebuild (node:test ไม่ต้องลง framework)
+npm run typecheck # tsc (สร้าง route types ของ Next ให้ก่อน — บน clone ใหม่ tsc เปล่าๆ จะพัง)
 npm run build   # production build
 npm start       # serve the production build
 npm run lint
