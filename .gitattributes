@@ -1,0 +1,16 @@
+# Everything text is stored and checked out as LF, on every platform.
+#
+# This is not a style preference. `scripts/build-map-data.mjs` writes lib/geo.ts and
+# lib/route-paths.ts with LF, and tests/build.test.mjs regenerates them and asserts the result is
+# byte-identical to what is committed — the guarantee that a fresh clone can rebuild the map offline.
+# Without this file, Git checks those files out as CRLF on Windows, the regenerated LF version differs
+# on every line, and `npm test` fails on a new machine while passing on the one that generated them.
+* text=auto eol=lf
+
+# Binary assets: never touched.
+*.png binary
+*.webp binary
+*.jpg binary
+*.jpeg binary
+*.avif binary
+*.ico binary
