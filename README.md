@@ -9,7 +9,11 @@ the river and the street network are real OpenStreetMap data, not illustration.
 
 ## เริ่มใช้งาน / Getting started
 
-ต้องมี **Node.js 20+**
+ต้องมี **Node.js 22.18+** (แนะนำ 24 LTS ขึ้นไป — พัฒนาและเทสจริงบน v25.8.2)
+
+ไม่ใช่แค่ให้ Next รันได้: `npm test` กับ script ใน `scripts/` **import `lib/*.ts` ตรงๆ** โดยอาศัย
+TypeScript stripping ที่ Node ทำให้เอง จึงไม่ต้องมี build step หรือ test framework — แต่ Node ที่เก่ากว่านี้
+จะพังทันทีที่รัน ไม่ใช่แค่เตือน
 
 ```bash
 npm install
