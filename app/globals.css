@@ -2,8 +2,20 @@
 
 /*
   Dark navy theme. Every ratio below was computed with the WCAG relative-luminance formula and checked,
-  not estimated — all 43 pairings pass, most by a wide margin. The project bar is stricter than WCAG AA
+  not estimated — all 50 pairings pass, most by a wide margin. The project bar is stricter than WCAG AA
   because this map gets read outdoors in Thai daylight: body text targets 7:1, nothing sits under 4.5:1.
+
+  Outdoors that 7:1 is not what the reader gets. Ambient light reflecting off the glass adds the same
+  luminance to every pixel, so contrast collapses toward 1:1 no matter what the palette does — in the
+  shade a 600-nit phone can produce at most 5.19:1 between pure white and pure black, and in direct
+  tropical sun at most 1.42:1. Body text here measures 4.73:1 in that shade case, which is 91% of the
+  physical ceiling. There is no palette that does meaningfully better; a light theme measures 4.97:1,
+  a 5% difference, which is why this project does not carry a second theme to switch to.
+
+  Run `node scripts/check-contrast.mjs` for both tables. What that model says to design around: the
+  separations that rely on small luminance steps go first. Island-against-water is 1.64:1 indoors and
+  1.14:1 in shade, effectively gone — the island stays legible outdoors because of the bright coastline
+  stroke (6.66:1 indoors, still 2.28:1 in shade), not its fill. Keep that stroke.
 
   The page is deep navy rather than black on purpose: pure #000 turns a phone screen into a mirror in
   sun and smears on OLED. #0B1220 keeps the depth without either problem.
@@ -30,7 +42,7 @@
   --color-land-edge: #6f9bd6;
   --color-map-glow: #16304f;
   --color-mainland: #0e1b2c;
-  --color-context-road: #24374f;
+  --color-context-road: #263951;
   --color-water: #06101f;
   /* Lighter than the land they cross, the way a chart engraves streets into the landmass. */
   --color-road-major: #8fb0d6;
@@ -77,6 +89,46 @@
   --color-route-6-ink: #0b1220;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/*
+  The two supplied marks — the KOH KRET header lockup and the อบต.เกาะเกร็ด seal — are the real artwork
+  painted through as a mask rather than drawn as images, so each takes `currentColor` from whatever the
+  call site sets, the same way every SVG mark here does. Both PNGs are white-on-transparent; see
+  scripts/build-mask-asset.mjs. Each has its own aspect (lockup 1.301:1, seal 1.422:1) which the
+  container has to match, or the mark is letterboxed inside its own box.
+*/
+.brand-lockup,
+.org-seal {
+  display: block;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.brand-lockup {
+  -webkit-mask-image: url("/brand-lockup.png");
+  mask-image: url("/brand-lockup.png");
+}
+.org-seal {
+  -webkit-mask-image: url("/org-seal.png");
+  mask-image: url("/org-seal.png");
+}
+
+/*
+  Two type families, not one: K2D for Thai (the primary language here) and Kanit for the English
+  wordmarks and section labels ("KOH KRET", "CATEGORIES", "HIGHLIGHT ROUTES"). Both are set by
+  `layout.tsx` via next/font/google as CSS custom properties, so the actual family name never leaks
+  into this file — swapping either font later is a one-line change there, not a find-and-replace here.
+*/
+.font-th {
+  font-family: var(--font-th), sans-serif;
+}
+.font-en {
+  font-family: var(--font-en), var(--font-th), sans-serif;
 }
 
 body {
@@ -279,8 +331,8 @@ body {
 }
 .road--major {
   stroke: var(--color-road-major);
-  stroke-width: 0.55;
-  opacity: 0.9;
+  stroke-width: 0.4;
+  opacity: 0.75;
 }
 .road--minor {
   stroke: var(--color-road-minor);
@@ -309,14 +361,42 @@ body {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+/* The unwalked preview of the whole route — always the full path, never dashed, so its shape reads
+   before a single stop has been tapped. Sits under the core/glow pair, which draw over it as progress
+   advances. */
+.route-line--ghost {
+  stroke-width: 1.1;
+  opacity: 0.22;
+}
+/* pathLength=1 (set on the element in MapCanvas) makes `1` mean "the whole line" regardless of its
+   real length, so `strokeDashoffset` from JS is a plain 0..1 walked fraction. The reveal itself is a
+   transition, not a mount keyframe: a tap changes the fraction and the line grows from where it
+   already was, rather than redrawing from zero on every stop. */
+.route-line--core,
+.route-line--glow {
+  stroke-dasharray: 1;
+  transition: stroke-dashoffset 650ms var(--ease-out-expo);
+}
 .route-line--core {
   stroke-width: 1.1;
-  animation: route-draw 500ms var(--ease-out-expo);
 }
 .route-line--glow {
   stroke-width: 2.4;
   opacity: 0.45;
-  animation: route-draw 500ms var(--ease-out-expo);
+}
+
+/* One per walked leg, at its midpoint, appearing the moment its leg is revealed. currentColor rides
+   the same route colour as the line it sits on. Filled rather than stroked so it stays crisp at 1.1
+   viewBox units — a stroke that thin would nearly disappear at 100% zoom. */
+/* Only opacity animates here, never transform — the element's `transform` attribute is doing the
+   real work of placing and rotating the arrow (set from route.arrows in MapCanvas), and a CSS
+   animation touching `transform` on the same element would fight that positioning attribute. */
+.route-arrow {
+  fill: currentColor;
+  stroke: var(--color-bg-map);
+  stroke-width: 0.25;
+  stroke-linejoin: round;
+  animation: arrow-in 220ms var(--ease-out-expo) both;
 }
 
 /* ---------------------------------------------------------------- pins */
@@ -410,6 +490,31 @@ body {
   line-height: 1;
 }
 
+/*
+  A contact glow at the true anchor point. Without one, a pin over open water-dark navy with no road
+  or coastline nearby has nothing under it to read as "touching ground" — the eye has no second
+  reference point, and the pin looks like it is hovering rather than planted. A dark drop-shadow does
+  not fix this: on navy, a black shadow barely differs from the field it sits on. Its own colour does —
+  `currentColor` is set on the pin itself, so this lands the pin's own hue as a soft pool of light at
+  its tip, the way a marker light looks against a dark map. A flat oval underneath reinforces the same
+  point without competing with it — depth first, then the colour that actually shows up on navy.
+*/
+.map-pin::after {
+  content: "";
+  position: absolute;
+  bottom: -0.05rem;
+  left: 50%;
+  width: 1.1rem;
+  height: 0.4rem;
+  transform: translate(-50%, 30%);
+  border-radius: 9999px;
+  background:
+    radial-gradient(ellipse, color-mix(in srgb, currentColor 65%, transparent) 0%, transparent 70%),
+    radial-gradient(ellipse, rgb(0 0 0 / 0.55) 0%, transparent 85%);
+  filter: blur(0.5px);
+  pointer-events: none;
+}
+
 /* The stem is a triangle built from borders, so it always matches the head's colour exactly. */
 .map-pin__stem {
   position: absolute;
@@ -463,14 +568,12 @@ body {
   }
 }
 
-@keyframes route-draw {
+@keyframes arrow-in {
   from {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
+    opacity: 0;
   }
   to {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 0;
+    opacity: 0.95;
   }
 }
 
@@ -541,12 +644,14 @@ body {
 */
 @media (prefers-reduced-motion: reduce) {
   .island-edge,
-  .route-line--core,
-  .route-line--glow,
+  .route-arrow,
   .map-pin,
   .stagger-in,
   .popup-enter {
     animation: none;
+  }
+  .route-arrow {
+    opacity: 0.95;
   }
   .map-pin {
     opacity: 1;

@@ -183,7 +183,16 @@ const { PLACES: SRC_PLACES, ROUTES: SRC_ROUTES } = await import(
 const PLACES = SRC_PLACES.map((p) => [p.id, p.lat, p.lng]);
 const ROUTES = Object.fromEntries(SRC_ROUTES.map((r) => [r.id, r.stops.map((s) => s.placeId)]));
 
+/*
+  A place is routable only if a walkable OSM way actually comes near its door. 80 m is the ceiling:
+  17 of the 19 places snap within 40 m, and the two that do not are 240 m out — the west-tip
+  restaurants, one of which publishes "reached by boat" as its own directions. Snapping those to a
+  node a quarter of a kilometre away used to succeed silently, so the drawn line skipped them while
+  the route went on advertising a walking distance that covered them.
+*/
+const SNAP_LIMIT_M = 80;
 const snapped = new Map();
+const snapDistance = new Map();
 for (const [id, lat, lon] of PLACES) {
   let best = null, bestD = Infinity;
   for (const [k, n] of nodes) {
@@ -191,7 +200,8 @@ for (const [id, lat, lon] of PLACES) {
     const d = metres(lon, lat, n.lon, n.lat);
     if (d < bestD) { bestD = d; best = k; }
   }
-  snapped.set(id, best);
+  snapDistance.set(id, bestD);
+  snapped.set(id, bestD <= SNAP_LIMIT_M ? best : null);
 }
 
 function shortestPath(from, to) {
@@ -218,31 +228,85 @@ function shortestPath(from, to) {
 
 const routeOut = {};
 let fallbacks = 0;
+/** Midpoint and heading of a polyline leg, in viewBox units. Used to plant one direction arrow per
+ *  leg so a route reads as travel from A to B, not just a coloured shape on the map. */
+function legMidpoint(pts) {
+  const seg = [];
+  let len = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    seg.push(d);
+    len += d;
+  }
+  if (len === 0) return null;
+  let target = len / 2;
+  for (let i = 0; i < seg.length; i++) {
+    if (target > seg[i]) { target -= seg[i]; continue; }
+    const t = seg[i] === 0 ? 0 : target / seg[i];
+    const [ax, ay] = pts[i], [bx, by] = pts[i + 1];
+    return {
+      x: +(ax + (bx - ax) * t).toFixed(2),
+      y: +(ay + (by - ay) * t).toFixed(2),
+      angle: +((Math.atan2(by - ay, bx - ax) * 180) / Math.PI).toFixed(1),
+    };
+  }
+  return null;
+}
+
 for (const [routeId, stops] of Object.entries(ROUTES)) {
   const coords = [];
+  const arrowsRaw = []; // {x, y, angle, at: cumulative metres at this arrow's position}
   let total = 0;
-  for (let i = 0; i < stops.length - 1; i++) {
-    const nodePath = shortestPath(snapped.get(stops[i]), snapped.get(stops[i + 1]));
+  // Walk only between the stops the network can actually reach; the rest are named in the output so
+  // the itinerary can tell the reader they need a boat instead of quietly dropping them.
+  const unreachable = [...new Set(stops.filter((id) => !snapped.get(id)))];
+  const walkable = stops.filter((id) => snapped.get(id));
+  // Cumulative metres walked AT each walkable stop, before normalising to a 0..1 fraction of the
+  // finished line. This is what lets a step-through UI say "reveal the line up to stop N" — the
+  // fraction is measured on the real walking distance, not on point count or stop index.
+  const stopMetres = [[walkable[0], 0]];
+  for (let i = 0; i < walkable.length - 1; i++) {
+    const nodePath = shortestPath(snapped.get(walkable[i]), snapped.get(walkable[i + 1]));
     if (!nodePath) { fallbacks++; continue; }
     for (let j = 1; j < nodePath.length; j++) {
       const a = nodes.get(nodePath[j - 1]), b = nodes.get(nodePath[j]);
       total += metres(a.lon, a.lat, b.lon, b.lat);
     }
+    const legPts = [];
     for (const k of nodePath) {
       const n = nodes.get(k);
       const pt = [+X(n.lon).toFixed(2), +Y(n.lat).toFixed(2)];
+      legPts.push(pt);
       const last = coords[coords.length - 1];
       if (!last || last[0] !== pt[0] || last[1] !== pt[1]) coords.push(pt);
     }
+    const mid = legMidpoint(legPts);
+    if (mid) arrowsRaw.push({ ...mid, at: total });
+    stopMetres.push([walkable[i + 1], total]);
   }
-  routeOut[routeId] = { d: 'M' + coords.map(([x, y]) => `${x},${y}`).join('L'), metres: Math.round(total) };
-  console.log(`route ${routeId.padEnd(10)} ${String(coords.length).padStart(4)} pts  ${(total / 1000).toFixed(2)} km`);
+  const stopOffsets = total > 0 ? stopMetres.map(([id, m]) => ({ placeId: id, offset: +(m / total).toFixed(4) })) : [];
+  const arrows = arrowsRaw.map(({ x, y, angle, at }) => ({ x, y, angle, offset: +(at / total).toFixed(4) }));
+  routeOut[routeId] = {
+    d: 'M' + coords.map(([x, y]) => `${x},${y}`).join('L'),
+    metres: Math.round(total),
+    ...(unreachable.length ? { unreachable } : {}),
+    ...(arrows.length ? { arrows } : {}),
+    ...(stopOffsets.length ? { stopOffsets } : {}),
+  };
+  console.log(
+    `route ${routeId.padEnd(10)} ${String(coords.length).padStart(4)} pts  ${(total / 1000).toFixed(2)} km  ${arrows.length} arrows` +
+      (unreachable.length ? `  NOT ON THE WALKING NETWORK: ${unreachable.join(', ')}` : '')
+  );
 }
 console.log(`straight-line fallbacks: ${fallbacks}`);
+console.log('\nsnap distance, place to nearest walkable node:');
+for (const [id, d] of [...snapDistance].sort((a, b) => b[1] - a[1])) {
+  console.log('  ' + id.padEnd(24) + d.toFixed(0).padStart(5) + ' m');
+}
 
 // ---- emit ----
 const G = [];
-G.push('// GENERATED from real OpenStreetMap data — do not hand-edit. Rebuild with scratchpad/rebuild-v2.mjs.');
+G.push('// GENERATED from real OpenStreetMap data — do not hand-edit. Rebuild with scripts/build-map-data.mjs.');
 G.push('//');
 G.push('// The frame is the island plus a 20% margin, so the Chao Phraya wrapping around it and the');
 G.push('// Pak Kret bank opposite are both visible: Koh Kret only reads as an island if you can see the');
@@ -306,21 +370,40 @@ G.push('');
 fs.writeFileSync(GEO_OUT, G.join('\n'));
 
 const R = [];
-R.push('// GENERATED — do not hand-edit. Rebuild with scratchpad/rebuild-v2.mjs.');
+R.push('// GENERATED — do not hand-edit. Rebuild with scripts/build-map-data.mjs.');
 R.push('//');
 R.push('// Route lines are real walking paths, not straight hops between pins. Every walkable OSM way on');
 R.push('// the island contributes an edge per consecutive coordinate pair; ways meeting at a junction share');
 R.push(`// the same coordinate, and a further ${welds} pairs within ${WELD_M} m are welded to close gaps OSM leaves`);
 R.push('// where ways visually meet but were never snapped. Stops snap to their nearest node and consecutive');
 R.push(`// stops are joined by Dijkstra shortest path. ${fallbacks} straight-line fallbacks across all routes.`);
+R.push(`// A stop further than ${SNAP_LIMIT_M} m from any walkable way is listed in \`unreachable\` rather than routed to.`);
 R.push('//');
 R.push('// Data © OpenStreetMap contributors, ODbL 1.0.');
 R.push('');
-R.push('export type RouteGeometry = { d: string; metres: number };');
+R.push('/** `unreachable` names stops no walkable way comes within 80 m of — a boat ride, not a walk. */');
+R.push('/** One heading per walked leg, at its midpoint, plus how far along the line it sits (0..1) — */');
+R.push('/** lets a step-through UI reveal only the arrows for legs already walked. */');
+R.push('export type RouteArrow = { x: number; y: number; angle: number; offset: number };');
+R.push('/** How far along the drawn line (0..1) each stop the network can reach falls. A place visited');
+R.push(" *  twice (a loop's start/end) appears twice, in walk order, so a UI can tell which visit is");
+R.push(' *  which by comparing against the current progress rather than by placeId alone. */');
+R.push('export type RouteStopOffset = { placeId: string; offset: number };');
+R.push('export type RouteGeometry = {');
+R.push('  d: string;');
+R.push('  metres: number;');
+R.push('  unreachable?: string[];');
+R.push('  arrows?: RouteArrow[];');
+R.push('  stopOffsets?: RouteStopOffset[];');
+R.push('};');
 R.push('');
 R.push('export const ROUTE_GEOMETRY: Record<string, RouteGeometry> = {');
 for (const [id, r] of Object.entries(routeOut)) {
-  R.push(`  ${JSON.stringify(id)}: { d: ${JSON.stringify(r.d)}, metres: ${r.metres} },`);
+  const extra =
+    (r.unreachable ? `, unreachable: ${JSON.stringify(r.unreachable)}` : '') +
+    (r.arrows ? `, arrows: ${JSON.stringify(r.arrows)}` : '') +
+    (r.stopOffsets ? `, stopOffsets: ${JSON.stringify(r.stopOffsets)}` : '');
+  R.push(`  ${JSON.stringify(id)}: { d: ${JSON.stringify(r.d)}, metres: ${r.metres}${extra} },`);
 }
 R.push('};');
 R.push('');

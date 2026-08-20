@@ -1,4 +1,4 @@
-// GENERATED from real OpenStreetMap data — do not hand-edit. Rebuild with scratchpad/rebuild-v2.mjs.
+// GENERATED from real OpenStreetMap data — do not hand-edit. Rebuild with scripts/build-map-data.mjs.
 //
 // The frame is the island plus a 20% margin, so the Chao Phraya wrapping around it and the
 // Pak Kret bank opposite are both visible: Koh Kret only reads as an island if you can see the

@@ -67,6 +67,12 @@ export type Place = {
    * thin the evidence is would be worse.
    */
   dataNote?: string;
+  /**
+   * True for the ferry landings on the Pak Kret bank — the places you leave from, not places on the
+   * island. They are the answer to "how do I get there", so they belong on the map, but every check
+   * that assumes a place sits inside the coastline has to know about them.
+   */
+  mainland?: true;
 };
 
 export const PLACES: Place[] = [
@@ -280,6 +286,37 @@ export const PLACES: Place[] = [
     lat: 13.90466,
     lng: 100.49031,
     description: "ท่าเรือข้ามฟากทางใต้ของเกาะ ขึ้นทะเบียนเป็นสถานีขนส่งสาธารณะใน OpenStreetMap",
+  },
+  {
+    id: "batik-fabric-house",
+    name: "Batik Fabric House",
+    category: "craft",
+    lat: 13.9026215,
+    lng: 100.4758822,
+    dataNote:
+      "OSM บันทึกไว้เป็น tourism=artwork มีแต่ชื่ออังกฤษ ไม่มีชื่อไทย เวลาเปิด หรือแหล่งอ้างอิงอื่น หลักฐานบางกว่าที่อื่นในชุดนี้",
+  },
+  // The two landings on the Pak Kret bank. Everyone arrives by ferry, and until now the map showed
+  // only the piers on the island side — the half of the crossing you are not standing on yet.
+  {
+    id: "tha-wat-sanam-nuea",
+    name: "ท่าวัดสนามเหนือ",
+    nameEn: "Wat Sanam Nuea Ferry Pier",
+    category: "pier",
+    lat: 13.9128265,
+    lng: 100.4916797,
+    mainland: true,
+    description: "ท่าเรือข้ามฟากฝั่งปากเกร็ด ขึ้นเรือที่วัดสนามเหนือ ข้ามไปขึ้นที่ท่าวัดปรมัยยิกาวาส",
+  },
+  {
+    id: "tha-wat-klang-kret",
+    name: "ท่าเรือข้ามฟากวัดกลางเกร็ด",
+    nameEn: "Wat Klang Kret Ferry",
+    category: "pier",
+    lat: 13.9046597,
+    lng: 100.4915896,
+    mainland: true,
+    description: "ท่าเรือข้ามฟากฝั่งปากเกร็ดทางใต้ ข้ามไปขึ้นที่ท่าเรือป่าฝ้าย",
   },
 ];
 

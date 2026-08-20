@@ -11,23 +11,11 @@ import {
 } from "@/lib/geo";
 import { ROUTE_GEOMETRY } from "@/lib/route-paths";
 import { getCategory, getPlace, placesAtSameSpot, type Place, type TourRoute } from "@/lib/places";
+import { frontPlaces } from "@/lib/pin-stack";
 import { Icon } from "@/lib/icons";
+import { FRAME_TALL, FRAME_WIDE, clampFrame, zoomFrame, type Frame } from "@/lib/frame";
 
 const { width: VW, height: VH } = MAP_VIEWBOX;
-
-/**
- * Two crops of the same projection. The wide one is the desktop letterbox, which keeps the whole page
- * inside one screen. On a phone that shape collapses the map to a 143px sliver, so narrow screens crop
- * the river margins instead and get a usable frame.
- *
- * The viewBox is an attribute, not a style, so this is picked in JS after mount rather than by a media
- * query. Pin positions are computed against whichever frame is live, which is what keeps a pin's tip
- * welded to its coordinate in both.
- */
-const FRAME_WIDE = { x: 0, y: 0, w: VW, h: VH };
-const FRAME_TALL = { x: VW / 2 - 62.5, y: 0, w: 125, h: VH };
-
-const MAX_ZOOM = 6;
 
 /** The width below which the wide letterbox renders too short to be a usable map. */
 const NARROW_PX = 640;
@@ -58,26 +46,6 @@ function useBaseFrame(ref: React.RefObject<HTMLElement | null>) {
     };
   }, [ref]);
   return narrow ? FRAME_TALL : FRAME_WIDE;
-}
-
-type Frame = { x: number; y: number; w: number; h: number };
-
-/**
- * Zoom by narrowing the viewBox rather than by CSS transform. Pin positions are already computed as
- * fractions of the live frame, so they follow the geometry exactly and stay pinned to their
- * coordinates at every zoom level — while keeping their own size, which a transform would scale.
- *
- * The frame is clamped to the base view, so the island can never be panned off into empty space.
- */
-function clampFrame(base: Frame, f: Frame): Frame {
-  const w = Math.min(base.w, Math.max(base.w / MAX_ZOOM, f.w));
-  const h = w * (base.h / base.w);
-  return {
-    w,
-    h,
-    x: Math.min(base.x + base.w - w, Math.max(base.x, f.x)),
-    y: Math.min(base.y + base.h - h, Math.max(base.y, f.y)),
-  };
 }
 
 export default function MapCanvas({
@@ -142,24 +110,26 @@ export default function MapCanvas({
   }, []);
 
   // A breakpoint change re-frames the map, which resets any zoom — the tall crop is a different view.
-  useEffect(() => setFrameNow(base), [base, setFrameNow]);
+  // React's "adjust state when a prop changes" pattern, in state rather than a ref: an effect would
+  // paint one frame of the old crop inside the new box first, and the lint rules here forbid both a
+  // synchronous setState inside an effect and a ref touched during render.
+  const [framedFor, setFramedFor] = useState(base);
+  if (framedFor !== base) {
+    setFramedFor(base);
+    setFrame(base);
+  }
+  // The animation goal follows the reset. Only on a re-frame — mirroring `frame` here every time
+  // would cancel every zoom tween on its first eased step.
+  useEffect(() => {
+    target.current = base;
+  }, [base]);
 
   const zoomed = frame.w < base.w - 0.001;
 
   /** Zoom about a focal point given in 0..1 of the current frame, so the spot under the cursor stays put. */
   const zoomBy = useCallback(
     (factor: number, fx = 0.5, fy = 0.5) => {
-      const prev = target.current;
-      const w = prev.w / factor;
-      const h = w * (base.h / base.w);
-      animateTo(
-        clampFrame(base, {
-          w,
-          h,
-          x: prev.x + (prev.w - w) * fx,
-          y: prev.y + (prev.h - h) * fy,
-        })
-      );
+      animateTo(zoomFrame(base, target.current, factor, fx, fy));
     },
     [base, animateTo]
   );
@@ -208,8 +178,40 @@ export default function MapCanvas({
   const routePlaces = activeRoute
     ? activeRoute.stops.map((s) => getPlace(s.placeId)).filter((p): p is Place => Boolean(p))
     : [];
-  const routeLine = activeRoute ? ROUTE_GEOMETRY[activeRoute.id]?.d : undefined;
+  const routeGeo = activeRoute ? ROUTE_GEOMETRY[activeRoute.id] : undefined;
+  const routeLine = routeGeo?.d;
   const routeStopIds = new Set(routePlaces.map((p) => p.id));
+
+  /**
+   * Walking a route one stop at a time: the line reveals up to whichever stop was last tapped,
+   * instead of the whole path appearing at once. `progress` is a fraction of the drawn line (0..1),
+   * taken straight from `stopOffsets` — real walking distance, not stop count — and driven by the
+   * same `selectedPlaceId` that already opens a pin's popup, so tapping a stop on the map or in the
+   * itinerary is the one gesture that does both.
+   *
+   * Adjusted during render, the same pattern `framedFor` above uses: an effect would paint one frame
+   * at the old progress first, and the lint rules here forbid both a synchronous setState inside an
+   * effect and a ref read during render.
+   */
+  const routeKey = activeRoute?.id ?? null;
+  const [progressState, setProgressState] = useState({ routeKey, forId: selectedPlaceId, value: 0 });
+  if (progressState.routeKey !== routeKey) {
+    // A different route (or none) — start its walk over from the beginning.
+    setProgressState({ routeKey, forId: selectedPlaceId, value: 0 });
+  } else if (progressState.forId !== selectedPlaceId) {
+    const offsets = routeGeo?.stopOffsets;
+    const matches = offsets && selectedPlaceId ? offsets.filter((o) => o.placeId === selectedPlaceId) : [];
+    // Not a stop on this route (or one reached only by boat) — leave progress where it was. A loop
+    // revisits its first stop at the end; land on whichever occurrence is next ahead of where you
+    // already are, so re-tapping the start pin after finishing the loop reveals the return leg
+    // rather than snapping the line back to zero.
+    const value = matches.length
+      ? (matches.find((m) => m.offset >= progressState.value)?.offset ?? matches[matches.length - 1].offset)
+      : progressState.value;
+    setProgressState({ routeKey, forId: selectedPlaceId, value });
+  }
+  const progress = progressState.value;
+  const walkedArrows = routeGeo?.arrows?.filter((a) => a.offset <= progress + 0.001) ?? [];
 
   // A highlighted route shows its own numbered stops. Anything else on screen has to be asked for:
   // `visiblePlaces` is empty until a category or a search narrows it, so the two can be combined
@@ -222,7 +224,11 @@ export default function MapCanvas({
   return (
     <div
       ref={wrapRef}
-      className={`relative w-full overflow-hidden rounded-2xl bg-[var(--color-bg-map)] ring-1 ring-[var(--color-hairline)] ${
+      // `z-0` is load-bearing: it makes this a stacking context so the pins' z-indexes (up to 150 for a
+      // selected one, 200 for the zoom controls) stay *inside* the map. Without it they competed
+      // directly with the popup's z-30 in the page's own stacking context, and the selected pin painted
+      // straight over the card describing it.
+      className={`relative z-0 w-full overflow-hidden rounded-2xl bg-[var(--color-bg-map)] ring-1 ring-[var(--color-hairline)] ${
         activeRoute ? "map-has-route" : ""
       }`}
     >
@@ -286,33 +292,65 @@ export default function MapCanvas({
 
         {activeRoute && routeLine && (
           <g key={activeRoute.id} style={{ color: activeRoute.color }}>
-            <path d={routeLine} className="route-line route-line--glow" pathLength={1} filter="url(#route-glow)" />
-            <path d={routeLine} className="route-line route-line--core" pathLength={1} />
+            {/* The whole route, faint, so its shape and destination are visible before you have tapped
+                a single stop — walking it one stop at a time should not mean starting from a blank map. */}
+            <path d={routeLine} className="route-line route-line--ghost" />
+            {/* Revealed up to `progress` via a normalised dash: pathLength=1 makes stroke-dashoffset a
+                plain 0..1 fraction of the line regardless of its real length, and the offset change is
+                a CSS transition (not a mount-only keyframe), so each tap animates from where you left
+                off rather than re-drawing the whole route from zero. */}
+            <path
+              d={routeLine}
+              className="route-line route-line--glow"
+              pathLength={1}
+              style={{ strokeDashoffset: 1 - progress }}
+              filter="url(#route-glow)"
+            />
+            <path
+              d={routeLine}
+              className="route-line route-line--core"
+              pathLength={1}
+              style={{ strokeDashoffset: 1 - progress }}
+            />
+            {/* One chevron per walked leg, at its midpoint, pointing the way you actually walk it. Only
+                the legs already revealed get one, so an arrow never points at ground you have not
+                reached yet on the line — it appears the moment its leg is drawn. */}
+            {walkedArrows.map((a, i) => (
+              <path
+                key={i}
+                d="M-1.1,-1.3 L1.1,0 L-1.1,1.3 Z"
+                className="route-arrow"
+                style={{ animationDelay: `${i * 60}ms` }}
+                transform={`translate(${a.x},${a.y}) rotate(${a.angle})`}
+              />
+            ))}
           </g>
         )}
       </svg>
 
       <div className="pointer-events-none absolute right-3 top-3 flex flex-col items-center gap-0.5 text-[var(--color-ink)] sm:right-5 sm:top-5">
         <Icon name="compass" className="h-8 w-8 sm:h-10 sm:w-10" strokeWidth={1.2} />
-        <span className="text-[10px] font-semibold tracking-[0.18em]">N</span>
+        <span className="font-en text-xs font-semibold tracking-[0.18em]">N</span>
       </div>
 
-      {/* Wheel and drag cover pointer users; these give the same reach by keyboard and on touch. */}
-      <div className="absolute bottom-3 right-3 flex flex-col gap-1.5 sm:bottom-4 sm:right-5">
+      {/* Wheel and drag cover pointer users; these give the same reach by keyboard and on touch.
+          Above every pin (max z 110, selected 150) — on the phone crop a pin genuinely lands on top
+          of this corner and used to eat the zoom-in click. */}
+      <div className="absolute bottom-3 right-3 z-[200] flex flex-col gap-1.5 sm:bottom-4 sm:right-5">
         <button type="button" onClick={() => zoomBy(1.6)} aria-label="ขยายแผนที่" className="map-zoom-btn">
-          +
+          <Icon name="zoom-in" className="h-4 w-4" strokeWidth={2} />
         </button>
         <button type="button" onClick={() => zoomBy(1 / 1.6)} aria-label="ย่อแผนที่" className="map-zoom-btn">
-          −
+          <Icon name="zoom-out" className="h-4 w-4" strokeWidth={2} />
         </button>
         <button
           type="button"
           onClick={() => animateTo(base)}
           aria-label="กลับไปมุมมองเต็มเกาะ"
           disabled={!zoomed}
-          className="map-zoom-btn text-[10px] disabled:opacity-35"
+          className="map-zoom-btn disabled:opacity-35"
         >
-          ⤢
+          <Icon name="expand" className="h-3.5 w-3.5" strokeWidth={2} />
         </button>
       </div>
 
@@ -324,7 +362,15 @@ export default function MapCanvas({
         </p>
       )}
 
-      {shown.map((place, i) => {
+      {/* A buried place is fully covered by a sibling's pin — see lib/pin-stack — so it does not get
+          one of its own; it stays reachable through that pin's "+N" badge and the popup's sibling
+          list, which is why `neighbours`/`buried` below are still computed against every place in
+          `shown`, not just the ones that render here. */}
+      {frontPlaces(
+        shown,
+        (p) => project(p.lat, p.lng),
+        placesAtSameSpot
+      ).map((place, i) => {
         const onRoute = routeStopIds.has(place.id);
         // A loop route can visit one place twice (the day trip starts and ends at the pier), so the
         // pin carries its first stop number and announces every visit.
@@ -363,9 +409,14 @@ export default function MapCanvas({
               left: `${((x - frame.x) / frame.w) * 100}%`,
               top: `${((y - frame.y) / frame.h) * 100}%`,
               // Southern pins overlap northern ones, the way a paper map stacks markers by depth.
-              zIndex: isSelected ? 40 : 10 + Math.round(y),
+              zIndex: isSelected ? 150 : 10 + Math.round(y),
               // Drop order: along the route when one is picked, otherwise in the order they were filtered in.
               animationDelay: `${(stopIndex >= 0 ? stopIndex : i) * 45}ms`,
+              // The pin's own colour, so `.map-pin::after` — the contact glow at its tip — can pick it
+              // up via currentColor rather than a flat black shadow, which barely registers against
+              // navy and is why an isolated pin (nothing else nearby to anchor it visually) read as
+              // floating instead of planted.
+              color,
             }}
           >
             <span className="map-pin__body" style={{ backgroundColor: color, color: ink }}>

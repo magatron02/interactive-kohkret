@@ -1,8 +1,13 @@
 /**
- * Line-art icon set drawn for this project. Stroke-based on a 24x24 grid (the brand mark uses 48x48),
- * tuned to stay readable down to 16px. No icon library, no emoji: the category marks are cultural
+ * Line-art icon set drawn for this project. Stroke-based on a 24x24 grid, tuned to stay readable down
+ * to 16px. The two brand marks are not here — the KOH KRET lockup and the อบต. seal are supplied
+ * artwork painted as CSS masks; see scripts/build-mask-asset.mjs. No icon library, no emoji: the category marks are cultural
  * symbols specific to Koh Kret (a Mon chedi, an unglazed earthenware jar, a river ferry, a stilt house)
- * and a generic pack would flatten exactly the detail that matters.
+ * and a generic pack would flatten exactly the detail that matters. The generic UI marks (search,
+ * close, chevron, route, globe, compass, zoom, expand) are drawn in the minimal single-stroke style
+ * common to open line-icon sets — Tabler, Feather, Lucide and the like, the kind catalogued at
+ * allsvgicons.com — adapted to this file's own 24x24 grid and stroke weight rather than imported as
+ * files, so every icon in the app shares one hand, not two.
  */
 
 export type IconName =
@@ -18,7 +23,9 @@ export type IconName =
   | "chevron-right"
   | "route"
   | "globe"
-  | "brand-chedi";
+  | "zoom-in"
+  | "zoom-out"
+  | "expand";
 
 type IconDef = { viewBox: string; paths: string[] };
 
@@ -67,12 +74,15 @@ const ICONS: Record<IconName, IconDef> = {
       "M13.4 6.4 C12.5 5.5 14.3 4.5 13.4 3.4",
     ],
   },
-  // Mon riverside house: the stilts are the point, so they stay visible.
+  // Mon riverside house: the stilts are the point, so they stay visible. The roofline kicks up at both
+  // eaves — a chofah gable, not a plain triangle — to read as Thai-vernacular rather than a generic hut,
+  // in the same family as the tiered chedi in `temple`.
   homestay: {
     viewBox: "0 0 24 24",
     paths: [
-      "M3.2 9.4 L12 3.8 L20.8 9.4",
-      "M5.8 7.8 V15.6 M18.2 7.8 V15.6",
+      "M12 4.2 V2.4",
+      "M2.6 10.2 C3.1 8.5 4.4 7.9 5.3 9.3 L12 4.2 L18.7 9.3 C19.6 7.9 20.9 8.5 21.4 10.2",
+      "M5.8 8.6 V15.6 M18.2 8.6 V15.6",
       "M4.4 15.6 H19.6",
       "M10.4 15.6 V11.2 H13.6 V15.6",
       "M7 15.6 V20.4 M12 15.6 V20.4 M17 15.6 V20.4",
@@ -127,22 +137,24 @@ const ICONS: Record<IconName, IconDef> = {
       "M12 3 C14.6 5.4 16 8.6 16 12 C16 15.4 14.6 18.6 12 21 C9.4 18.6 8 15.4 8 12 C8 8.6 9.4 5.4 12 3 Z",
     ],
   },
-  // Logo mark: chedi with an extra tier and parasol ring, a canopied river boat, a waterline, and gulls.
-  "brand-chedi": {
-    viewBox: "0 0 48 48",
+  // Plus and minus for the zoom control — was two literal "+"/"−" characters, which meant the button
+  // face came from whatever font the OS substituted rather than this icon system.
+  "zoom-in": {
+    viewBox: "0 0 24 24",
+    paths: ["M12 5 V19", "M5 12 H19"],
+  },
+  "zoom-out": {
+    viewBox: "0 0 24 24",
+    paths: ["M5 12 H19"],
+  },
+  // Four corners pulling outward — "back to the full island view", not a literal ⤢ glyph.
+  expand: {
+    viewBox: "0 0 24 24",
     paths: [
-      "M17 4 V13",
-      "M14.6 6.6 H19.4 M15.4 9.4 H18.6",
-      "M11 25 C11 18.4 13.4 13.9 17 13 C20.6 13.9 23 18.4 23 25",
-      "M9.4 25 H24.6",
-      "M10.6 25 L9.2 30 M23.4 25 L24.8 30",
-      "M7.6 30 H26.4",
-      "M9 30 L7.6 34.8 M25 30 L26.4 34.8",
-      "M5.8 34.8 H28.2",
-      "M30 37 H44 C44 40 42 42.4 39.2 42.4 H34.8 C32 42.4 30 40 30 37 Z",
-      "M33.6 37 V33.2 H40.4 V37",
-      "M4 42.4 C6 41 8 43.8 10 42.4 C12 41 14 43.8 16 42.4 C18 41 20 43.8 22 42.4 C24 41 26 43.8 28 42.4",
-      "M30 12.4 C31 11 32 11 33 12.4 C34 11 35 11 36 12.4 M37.4 8.8 C38.2 7.7 39 7.7 39.8 8.8 C40.6 7.7 41.4 7.7 42.2 8.8",
+      "M9 3 H3 V9",
+      "M15 3 H21 V9",
+      "M9 21 H3 V15",
+      "M15 21 H21 V15",
     ],
   },
 };

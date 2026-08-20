@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PLACES, ROUTES, getPlace, type Category } from "@/lib/places";
+import { PLACES, ROUTES, getCategory, getPlace, type Category } from "@/lib/places";
 import BrandLockup from "@/components/BrandLockup";
 import MapCanvas from "@/components/MapCanvas";
 import CategoryPanel from "@/components/CategoryPanel";
@@ -26,10 +26,16 @@ export default function Home() {
     const query = searchQuery.trim().toLowerCase();
     return PLACES.filter((p) => {
       const matchesCategory = activeCategories.size === 0 || activeCategories.has(p.category);
+      // Category labels are searchable because they are the words a visitor actually types. The panel
+      // beside this box prints "ร้านกาแฟ"; typing it and getting nothing back reads as a broken search,
+      // not as a hint to go and click the chip instead.
+      const category = getCategory(p.category);
       const matchesSearch =
         !query ||
         p.name.toLowerCase().includes(query) ||
-        (p.nameEn?.toLowerCase().includes(query) ?? false);
+        (p.nameEn?.toLowerCase().includes(query) ?? false) ||
+        category.label.toLowerCase().includes(query) ||
+        category.labelEn.toLowerCase().includes(query);
       return matchesCategory && matchesSearch;
     });
   }, [activeCategories, searchQuery]);

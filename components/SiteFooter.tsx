@@ -1,4 +1,5 @@
 import { Icon } from "@/lib/icons";
+import OrgSeal from "@/components/OrgSeal";
 
 /**
  * Only verified facts appear here. The reference poster carries a phone number and a Facebook page;
@@ -10,12 +11,14 @@ export default function SiteFooter() {
     <footer className="mt-auto border-t border-[var(--color-hairline)] pt-3.5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Icon name="brand-chedi" className="h-8 w-8 shrink-0 text-[var(--color-ink-muted)]" strokeWidth={1.3} />
+          {/* 1.42:1, the artwork's own proportions — a square box letterboxes it and shrinks the arced
+              lettering to unreadable texture. Sized so the two lines of Thai still read as words. */}
+          <OrgSeal className="h-[4.22rem] w-24 shrink-0 text-[var(--color-ink-muted)] sm:h-[4.92rem] sm:w-28" />
           <div>
-            <p className="text-[13px] font-medium text-[var(--color-ink)]">
+            <p className="text-sm font-medium text-[var(--color-ink)]">
               องค์การบริหารส่วนตำบลเกาะเกร็ด จังหวัดนนทบุรี
             </p>
-            <p className="text-[11px] text-[var(--color-ink-faint)]">
+            <p className="font-en text-xs text-[var(--color-ink-faint)]">
               Koh Kret Subdistrict Administrative Organization
             </p>
           </div>
@@ -25,14 +28,14 @@ export default function SiteFooter() {
           href="https://www.kohkred-sao.go.th/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-11 items-center gap-2 self-start rounded-lg px-2 text-[13px] text-[var(--color-ink-muted)] transition-colors duration-150 hover:text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-deep)] sm:self-auto"
+          className="inline-flex min-h-11 items-center gap-2 self-start rounded-lg px-2 text-sm text-[var(--color-ink-muted)] transition-colors duration-150 hover:text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-deep)] sm:self-auto"
         >
           <Icon name="globe" className="h-4 w-4" strokeWidth={1.6} />
           kohkred-sao.go.th
         </a>
       </div>
 
-      <p className="mt-2 text-[10px] leading-snug text-[var(--color-ink-faint)]">
+      <p className="mt-2 text-xs leading-snug text-[var(--color-ink-faint)]">
         ชายฝั่ง แม่น้ำ โครงข่ายถนน และพิกัดสถานที่มาจาก OpenStreetMap — ข้อมูล ©{" "}
         <a
           href="https://www.openstreetmap.org/copyright"

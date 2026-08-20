@@ -15,7 +15,7 @@ export default function RouteLegend({
       <div className="flex min-h-9 items-center justify-between gap-3">
         <h2
           id="routes-heading"
-          className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]"
+          className="font-en text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)]"
         >
           Highlight Routes
         </h2>
@@ -65,7 +65,7 @@ export default function RouteLegend({
                   >
                     {route.name}
                   </span>
-                  <span className="block truncate text-[10px] text-[var(--color-ink-faint)]">
+                  <span className="block truncate text-[11px] text-[var(--color-ink-faint)]">
                     {route.durationLabel}
                     {ROUTE_GEOMETRY[route.id] && ` · เดิน ${formatDistance(ROUTE_GEOMETRY[route.id].metres)}`}
                   </span>

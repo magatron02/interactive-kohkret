@@ -41,7 +41,7 @@ export default function SearchBar({
           </button>
         )}
       </div>
-      <p aria-live="polite" className="mt-1.5 min-h-4 text-[11px] text-[var(--color-ink-faint)]">
+      <p aria-live="polite" className="mt-1.5 min-h-4 text-xs text-[var(--color-ink-faint)]">
         {query ? `พบ ${resultCount} สถานที่` : ""}
       </p>
     </div>

@@ -30,24 +30,24 @@ export default function VirtualTourCard() {
         </a>
 
         <div className="min-w-0">
-          <h2 id="qr-heading" className="text-[13px] font-semibold text-[var(--color-ink)]">
+          <h2 id="qr-heading" className="text-base font-semibold text-[var(--color-ink)]">
             สแกนเพื่อดูข้อมูลทางการ
           </h2>
-          <p className="mt-1 text-xs leading-relaxed text-[var(--color-ink-muted)]">
+          <p className="mt-1 text-sm leading-relaxed text-[var(--color-ink-muted)]">
             เว็บไซต์ อบต.เกาะเกร็ด
           </p>
           <a
             href={QR_TARGET_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="-ml-1 mt-0.5 inline-flex min-h-11 items-center break-all rounded px-1 text-[11px] text-[var(--color-primary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-map)]"
+            className="-ml-1 mt-0.5 inline-flex min-h-11 items-center break-all rounded px-1 text-xs text-[var(--color-primary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-map)]"
           >
             {QR_TARGET_LABEL}
           </a>
         </div>
       </div>
 
-      <p className="mt-3 border-t border-[var(--color-hairline)] pt-2.5 text-[11px] leading-relaxed text-[var(--color-ink-faint)]">
+      <p className="mt-3 border-t border-[var(--color-hairline)] pt-2.5 text-xs leading-relaxed text-[var(--color-ink-faint)]">
         ทัวร์เสมือน 360° ยังไม่เปิดให้บริการ
       </p>
     </section>

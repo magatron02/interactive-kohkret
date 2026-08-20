@@ -17,7 +17,7 @@ export default function CategoryPanel({
       <div className="flex min-h-9 items-center justify-between gap-3">
         <h2
           id="categories-heading"
-          className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]"
+          className="font-en text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)]"
         >
           Categories
         </h2>
@@ -67,17 +67,17 @@ export default function CategoryPanel({
                 </span>
 
                 <span className="min-w-0 lg:flex-1">
-                  <span className="block whitespace-nowrap text-[13px] font-medium leading-tight text-[var(--color-ink)] lg:truncate lg:whitespace-normal">
+                  <span className="block whitespace-nowrap text-sm font-medium leading-tight text-[var(--color-ink)] lg:truncate lg:whitespace-normal">
                     {cat.label}
                   </span>
                   {/* The English sublabel is desktop-only: on a phone it costs a line and earns nothing. */}
-                  <span className="hidden truncate text-[10px] uppercase tracking-[0.14em] text-[var(--color-ink-faint)] lg:block">
+                  <span className="font-en hidden truncate text-[11px] uppercase tracking-[0.12em] text-[var(--color-ink-faint)] lg:block">
                     {cat.labelEn}
                   </span>
                 </span>
 
                 <span
-                  className="grid h-6 min-w-6 shrink-0 place-items-center rounded-full px-1.5 text-xs font-semibold tabular-nums"
+                  className="grid h-6 min-w-6 shrink-0 place-items-center rounded-full px-1.5 text-[13px] font-semibold tabular-nums"
                   style={{ backgroundColor: cat.color, color: cat.ink }}
                 >
                   {count}

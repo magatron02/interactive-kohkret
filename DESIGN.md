@@ -23,27 +23,27 @@ colors:
   cat-craft: "#C08CFF"
   cat-pier: "#45D07A"
 typography:
-  display:
-    fontFamily: "Noto Sans Thai, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "2rem"
-    fontWeight: 800
-    lineHeight: 0.92
-    letterSpacing: "-0.02em"
+  # Two families, both self-hosted by next/font/google and exposed as CSS variables.
+  # --font-th (K2D) is the default on <body>; --font-en (Baloo 2) is opted into per element
+  # with .font-en for the English wordmark and section labels.
+  families:
+    thai: "var(--font-th), sans-serif"       # K2D
+    latin: "var(--font-en), var(--font-th), sans-serif"  # Baloo 2
   title:
-    fontFamily: "Noto Sans Thai, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.8125rem"
+    fontFamily: "var(--font-th)"
+    fontSize: "1rem"
     fontWeight: 600
     lineHeight: 1.4
   body:
-    fontFamily: "Noto Sans Thai, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.8125rem"
+    fontFamily: "var(--font-th)"
+    fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.6
   label:
-    fontFamily: "Noto Sans Thai, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.6875rem"
+    fontFamily: "var(--font-en)"
+    fontSize: "0.875rem"
     fontWeight: 600
-    letterSpacing: "0.2em"
+    letterSpacing: "0.18em"
 rounded:
   sm: "8px"
   md: "12px"
@@ -98,7 +98,7 @@ surface is a desaturated navy, and the only glow in the system is the soft halo 
 
 **Key Characteristics:**
 - Deep navy ground, never black; surfaces separated by hairlines rather than luminance jumps or shadows
-- One typeface (Noto Sans Thai), 400 weight floor — thin white on navy blooms in sunlight
+- Two matched typefaces (K2D for Thai, Baloo 2 for Latin), 400 weight floor — thin white on navy blooms in sunlight
 - Real geography: real coastline, real street grid, real coordinates, real counts
 - Colour is reserved for identity (category) and state (active route); the map field itself is monochrome
 - Motion narrates the trip and never decorates
@@ -146,17 +146,30 @@ appears, the design has started drifting toward the HUD look this system rejects
 
 ## 3. Typography
 
-**Display / Body / Label Font:** Noto Sans Thai (with ui-sans-serif, system-ui)
+**Thai (default):** K2D — `--font-th`, set on `<body>`, carries all body copy.
+**Latin (opt-in):** Baloo 2 — `--font-en`, applied per element with `.font-en`.
 
-**Character:** one family carrying Thai and Latin without a font-switch seam, with hierarchy built from weight
-and size rather than a second typeface. Correct for a tool that is scanned, not read.
+Both are self-hosted at build time via `next/font/google`, so neither costs a runtime request and the
+family names never leak past `app/layout.tsx`.
+
+**Character:** deliberately *not* the geometric grotesk a dark dashboard defaults to (Poppins, Montserrat,
+Inter, Kanit) — that shape reads generic because it is everywhere. K2D's terminals are soft and rounded;
+Baloo 2 is built the same way, so the pair reads as one family rather than a Thai face with an unrelated
+Latin face bolted on.
+
+Thai nested inside a `.font-en` element has to be given `.font-th` back explicitly — `font-family`
+inherits, so without it Baloo 2 renders under Thai text.
 
 ### Hierarchy
-- **Display** (800, 2rem, 0.92 line-height, -0.02em): the "KOH KRET" wordmark only.
-- **Title** (600, 13px): section names, place names, route names.
-- **Body** (400, 13px, 1.6): descriptions and itinerary copy.
-- **Label** (600, 11px, 0.2em tracking, uppercase): the three region headers — CATEGORIES, HIGHLIGHT ROUTES,
-  and the English sublabels in the category rows.
+- **Display**: none. The "KOH KRET" wordmark is artwork (`public/brand-lockup.png`), not set type; the
+  `<h1>` holds the words `sr-only` for semantics while the mark does the showing.
+- **Title** (600, 16px): section names, place names, route names.
+- **Body** (400, 14px, 1.6): descriptions and itinerary copy.
+- **Label** (`.font-en`, 600, 14px, 0.18em tracking, uppercase): the region headers — CATEGORIES,
+  HIGHLIGHT ROUTES, SMART TOURISM MAP — and the English sublabels in the category rows.
+
+Sizes were raised across the board from an earlier, tighter scale: this is read at arm's length outdoors,
+where 11–13px copy is the first thing to fail.
 
 ### Named Rules
 **The Three Kickers Rule.** Uppercase tracked labels exist in exactly three places, because the reference
@@ -221,7 +234,7 @@ fan onto a small ring at render time; the underlying coordinates are never alter
 ### Do:
 - **Do** keep the page deep navy (#0B1220) and never pure black — glare and OLED smear are the reason.
 - **Do** hold body text at or above 7:1 and re-measure with a real luminance calculation after any colour
-  change. All 43 pairings in this system were computed, not estimated.
+  change. All 50 pairings in this system were computed, not estimated.
 - **Do** reserve Kiln Clay (#E3714A) for active state, the flagship route, focus rings and links.
 - **Do** separate regions with the single hairline token instead of adding borders, shadows or nested cards.
 - **Do** show real counts and real place data; leave a field blank and design the empty state when a fact is

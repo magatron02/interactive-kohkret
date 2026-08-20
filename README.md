@@ -19,9 +19,11 @@ npm run dev
 เปิด http://localhost:3000
 
 ```bash
+npm test        # 64 assertions — ข้อมูล เส้นทาง QR และการ rebuild (node:test ไม่ต้องลง framework)
 npm run build   # production build
 npm start       # serve the production build
 npm run lint
+npm run shoot   # ภาพหน้าจอจริง 8 สถานะ ผ่าน headless Chrome (ต้องมี server รันอยู่)
 ```
 
 ---
@@ -55,17 +57,20 @@ npm run lint
 ## โครงสร้าง / Layout
 
 ```
-app/            หน้าเว็บ, layout, globals.css (design tokens + motion + map layer styles)
+app/            หน้าเว็บ, layout (ฟอนต์), globals.css (design tokens + motion + map layer styles)
 components/     UI ทั้งหมด — MapCanvas คือหัวใจ (projection, zoom, pins)
 lib/
   places.ts     ★ ข้อมูลสถานที่ + หมวดหมู่ + เส้นทาง — แก้ที่นี่
   geo.ts        GENERATED — ชายฝั่ง แม่น้ำ ถนน projection
-  route-paths.ts GENERATED — เส้นทางเดินตามถนน + ระยะทาง
+  route-paths.ts GENERATED — เส้นทางเดินตามถนน + ระยะทาง + ลูกศร + จุดแวะ
+  frame.ts      กรอบแผนที่ 2 แบบ + เลขคณิตการซูม (pure, ไม่มี React → เทสได้)
+  pin-stack.ts  เลือกหมุดหน้าสุดของแต่ละกลุ่มที่ทับกัน
   icons.tsx     ไอคอนลายเส้นวาดเอง
   qr.ts         QR ของจริง (สแกนได้) ไปเว็บ อบต.เกาะเกร็ด
   maps-links.ts ลิงก์ Google Maps แบบ deep link
-scripts/        ท่อข้อมูล OSM (ดูด้านล่าง)
-public/         ลายพื้นหลังฝาโอ่งมอญ
+scripts/        ท่อข้อมูล OSM + เครื่องมือ (ดูด้านล่าง)
+tests/          node:test — ไม่มี framework ไม่มี dependency
+public/         ลายพื้นหลังฝาโอ่งมอญ + โลโก้ 2 ตัว (brand-lockup, org-seal)
 ```
 
 `lib/geo.ts` และ `lib/route-paths.ts` **เป็นไฟล์ที่ถูก generate — อย่าแก้ด้วยมือ** แก้แล้วรัน script ใหม่
@@ -79,8 +84,11 @@ public/         ลายพื้นหลังฝาโอ่งมอญ
 ```bash
 node scripts/build-map-data.mjs        # rebuild lib/geo.ts + lib/route-paths.ts
 node scripts/optimise-route-order.mjs  # solve stop order, report retraced metres
-node scripts/check-contrast.mjs        # verify every colour pairing
+node scripts/check-contrast.mjs        # ตรวจ 50 คู่สี ทั้งในร่มและกลางแดด (exit 1 ถ้าตก)
+node scripts/build-mask-asset.mjs <src> <ชื่อ> [กว้าง]   # โลโก้: อาร์ตเวิร์ก → mask โปร่งใสใน public/
 ```
+
+`npm test` ยืนยันว่า generated files rebuild ออกมาเหมือนเดิมทุก byte จาก cache ที่อยู่ใน repo — clone แล้วรันได้เลยไม่ต้องต่อเน็ต
 
 ### เพิ่ม/แก้สถานที่
 
@@ -112,10 +120,16 @@ curl -s -X POST --data-urlencode "data@scripts/osm-cache/roads-poly.overpassql" 
 - **ทัวร์เสมือน 360°** ยังไม่มี — QR ชี้เว็บทางการ อบต. แทน ไม่ได้อ้างว่าเป็นทัวร์
 - **AI guide** ตัดออกตามที่ตกลง (ต้องมี backend + ค่า API ต่อเนื่อง)
 - **สถานที่ที่ยังไม่มีพิกัดยืนยัน** เช่น กาแฟบ้านเลขที่ ๑ — มีแค่ที่อยู่ "1 หมู่ 1" ซึ่ง geocode ไม่ได้ จึงยังไม่ใส่
-- **คำอธิบายขาด** ~10 จาก 19 แห่ง เพราะยังหาแหล่งอ้างอิงไม่ได้ UI แสดง empty state ตรงๆ
+  ร้านอีกหลายสิบแห่งที่เห็นบน Google Maps (คาเฟ่ โฮมสเตย์ ร้านปั้นดิน) ก็ยังไม่มีใน OSM เลย ค้นทั้ง Overpass
+  และ Nominatim แล้วไม่พบสักชื่อ — ถ้าจะเพิ่ม ต้องคลี่ short link ของหมุดร้านนั้นแล้วอ่าน `!3d<lat>!4d<lng>`
+- **คำอธิบายขาด** 6 จาก 22 แห่ง เพราะยังหาแหล่งอ้างอิงไม่ได้ UI แสดง empty state ตรงๆ
 - **6 เส้นทาง ไม่ใช่ 8** ตามโปสเตอร์อ้างอิง — อีก 2 เส้นต้องใช้สถานที่ประเภทที่เกาะมีไม่พอ
 - **เส้นทาง 1 วันยังเดินซ้ำ 20%** เป็นข้อจำกัดของเกาะ (ถนนแกนเดียว ซอยตันเข้าวัด) ไม่ใช่ของอัลกอริทึม
-- **ยังไม่มี test suite** และยังไม่ได้ทดสอบบนอุปกรณ์จริงกลางแดด ซึ่งเป็นสมมติฐานหลักของธีมมืด
+- **2 จุดในเส้นทางอาหารริมน้ำเดินไปไม่ถึง** ร.ศ.๑๒๗ กับ RIVA อยู่ปลายเกาะฝั่งตะวันตก ห่างจากทางเดินที่ OSM มี ~250 ม.
+  (ร.ศ.๑๒๗ เขียนเองว่าเข้าถึงโดยเรือ) เส้นบนแผนที่และระยะเดินจึงไม่รวม 2 จุดนี้ และหน้าแผนเที่ยวบอกไว้ตรงๆ
+- **ยังไม่ได้ทดสอบบนอุปกรณ์จริงกลางแดด** แต่คำนวณไว้แล้ว: กลางแดดจัด จอ 600 nits ทำ contrast ได้สูงสุด 1.42:1
+  (ขาวล้วนบนดำล้วน) — ไม่มีชุดสีไหนช่วยได้ ชุดนี้ในที่ร่มได้ 4.73:1 คิดเป็น 91% ของเพดานทางฟิสิกส์
+- **test ครอบคลุมเฉพาะข้อมูลกับเรขาคณิต ไม่ครอบ UI** เรื่อง layout ซูม และการซ้อนของหมุด ยังต้องเปิดแอปวัดจริง
 
 ---
 

@@ -20,7 +20,12 @@ export default function PlacePopup({
 
   return (
     <div
-      className={`absolute inset-x-3 bottom-3 z-30 rounded-xl border border-[var(--color-hairline)] bg-[var(--color-bg-elevated)] p-4 shadow-[0_12px_32px_rgba(0,0,0,0.45)] sm:inset-x-auto sm:left-4 sm:bottom-4 sm:max-w-sm ${
+      // Anchored to the bottom, so a tall card grows upward — and the tallest ones (a description, a
+      // cuisine list, a phone, a sibling place and a dataNote) are taller than the map frame itself.
+      // The card is a sibling of the map, not a child, so the map's own `overflow-hidden` does not clip
+      // it: unbounded, it ran 90px past the top edge and over the site header. Capped to the frame with
+      // its own scroll instead.
+      className={`absolute inset-x-3 bottom-3 z-30 max-h-[calc(100%-1.5rem)] overflow-y-auto overscroll-contain rounded-xl border border-[var(--color-hairline)] bg-[var(--color-bg-elevated)] p-4 shadow-[0_12px_32px_rgba(0,0,0,0.45)] sm:inset-x-auto sm:left-4 sm:bottom-4 sm:max-h-[calc(100%-2rem)] sm:max-w-sm ${
         closing ? "popup-exit pointer-events-none" : "popup-enter"
       }`}
     >
@@ -34,20 +39,20 @@ export default function PlacePopup({
       </button>
 
       <span
-        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium"
+        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
         style={{ backgroundColor: category.color, color: category.ink }}
       >
         <Icon name={category.id} className="h-3.5 w-3.5" strokeWidth={1.8} />
         {category.label}
       </span>
 
-      <h3 className="mt-2 pr-8 text-sm font-semibold leading-snug text-[var(--color-ink)]">{place.name}</h3>
-      {place.nameEn && <p className="text-[11px] text-[var(--color-ink-faint)]">{place.nameEn}</p>}
+      <h3 className="mt-2 pr-8 text-base font-semibold leading-snug text-[var(--color-ink)]">{place.name}</h3>
+      {place.nameEn && <p className="text-xs text-[var(--color-ink-faint)]">{place.nameEn}</p>}
 
       {place.description ? (
-        <p className="mt-2 text-[13px] leading-relaxed text-[var(--color-ink-muted)]">{place.description}</p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-muted)]">{place.description}</p>
       ) : (
-        <p className="mt-2 text-[13px] leading-relaxed text-[var(--color-ink-faint)]">
+        <p className="mt-2 text-sm leading-relaxed text-[var(--color-ink-faint)]">
           ยังไม่มีคำอธิบายที่ตรวจสอบแหล่งที่มาได้สำหรับสถานที่นี้
         </p>
       )}
@@ -57,7 +62,7 @@ export default function PlacePopup({
           {place.cuisine.map((c) => (
             <li
               key={c}
-              className="rounded border border-[var(--color-hairline)] px-1.5 py-0.5 text-[11px] text-[var(--color-ink-muted)]"
+              className="rounded border border-[var(--color-hairline)] px-1.5 py-0.5 text-xs text-[var(--color-ink-muted)]"
             >
               {c}
             </li>
@@ -65,7 +70,7 @@ export default function PlacePopup({
         </ul>
       )}
 
-      <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-[var(--color-hairline)] pt-2.5 text-[11px]">
+      <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-[var(--color-hairline)] pt-2.5 text-xs">
         <div className="flex gap-1.5">
           <dt className="text-[var(--color-ink-faint)]">เวลาเปิด</dt>
           <dd className="text-[var(--color-ink-muted)]">{place.hours ?? "ไม่ระบุ"}</dd>
@@ -97,7 +102,7 @@ export default function PlacePopup({
           href={directionsLink(place)}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 text-[13px] font-semibold text-[var(--color-bg-deep)] transition-opacity duration-150 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-elevated)]"
+          className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 text-sm font-semibold text-[var(--color-bg-deep)] transition-opacity duration-150 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-elevated)]"
         >
           <Icon name="route" className="h-4 w-4" strokeWidth={1.8} />
           นำทางไปที่นี่
@@ -106,7 +111,7 @@ export default function PlacePopup({
           href={placeLink(place)}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--color-hairline)] px-3 text-[13px] text-[var(--color-ink-muted)] transition-colors duration-150 hover:border-[var(--color-ink-faint)] hover:text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-elevated)]"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--color-hairline)] px-3 text-sm text-[var(--color-ink-muted)] transition-colors duration-150 hover:border-[var(--color-ink-faint)] hover:text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-elevated)]"
         >
           ดูบนแผนที่
         </a>
@@ -117,7 +122,7 @@ export default function PlacePopup({
           {place.phone && (
             <a
               href={`tel:${place.phone.replace(/[^+\d]/g, "")}`}
-              className="inline-flex min-h-11 items-center rounded text-[12px] text-[var(--color-primary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+              className="inline-flex min-h-11 items-center rounded text-[13px] text-[var(--color-primary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
             >
               {place.phone}
             </a>
@@ -127,7 +132,7 @@ export default function PlacePopup({
               href={place.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center rounded text-[12px] text-[var(--color-primary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+              className="inline-flex min-h-11 items-center rounded text-[13px] text-[var(--color-primary)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
             >
               เว็บไซต์ร้าน
             </a>
@@ -137,7 +142,7 @@ export default function PlacePopup({
 
       {neighbours.length > 0 && (
         <div className="mt-2.5 border-t border-[var(--color-hairline)] pt-2">
-          <p className="text-[11px] text-[var(--color-ink-faint)]">
+          <p className="text-xs text-[var(--color-ink-faint)]">
             อีก {neighbours.length} แห่งที่จุดเดียวกัน
           </p>
           <ul className="mt-1 flex flex-wrap gap-1.5">
@@ -148,7 +153,7 @@ export default function PlacePopup({
                   <button
                     type="button"
                     onClick={() => onSelectPlace(n.id)}
-                    className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--color-hairline)] px-2 text-[12px] text-[var(--color-ink-muted)] transition-colors duration-150 hover:border-[var(--color-ink-faint)] hover:text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-elevated)]"
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--color-hairline)] px-2 text-[13px] text-[var(--color-ink-muted)] transition-colors duration-150 hover:border-[var(--color-ink-faint)] hover:text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-elevated)]"
                   >
                     <span style={{ color: nc.color }}>
                       <Icon name={nc.id} className="h-3.5 w-3.5" strokeWidth={1.8} />

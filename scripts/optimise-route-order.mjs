@@ -83,7 +83,6 @@ function dijkstra(from) {
 }
 const trees = new Map();
 for (const id of Object.keys(PLACES)) trees.set(id, dijkstra(snapped.get(id)));
-const cost = (a, b) => trees.get(a).dist.get(snapped.get(b)) ?? Infinity;
 function legNodes(a, b) {
   const { prev } = trees.get(a);
   const target = snapped.get(b);
