@@ -78,6 +78,7 @@ and the route stop order exist once. Adding a stop to a route means editing `lib
 ## Verifying your work
 
 ```bash
+npm run setup     # machine check + install + the whole gate, in one command
 npm test          # 64 assertions over the data, routes, map frame, QR, both brand marks and the build
 npm run typecheck # next typegen && tsc --noEmit
 npm run shoot     # real full-resolution screenshots of eight states, into screenshots/

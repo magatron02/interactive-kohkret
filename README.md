@@ -17,10 +17,13 @@ TypeScript stripping ที่ Node ทำให้เอง จึงไม่�
 
 ```bash
 npm install
+npm run setup     # เช็คเครื่อง ติดตั้ง dependency แล้วรันเทสทั้งชุดให้จบในคำสั่งเดียว
 npm run dev
 ```
 
 เปิด http://localhost:3000
+
+`npm run setup` จะบอกเองถ้า Node เก่าเกิน พร้อมคำสั่งติดตั้งของ OS นั้นๆ และไม่แตะอะไรในเครื่องถ้ายังไม่พร้อม
 
 ```bash
 npm test        # 64 assertions — ข้อมูล เส้นทาง QR โลโก้ และการ rebuild (node:test ไม่ต้องลง framework)
