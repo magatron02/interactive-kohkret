@@ -122,7 +122,7 @@ export const PLACES: Place[] = [
   {
     id: "wat-sala-kun",
     name: "วัดศาลากุล",
-    nameEn: "Wat Sala Kun",
+    nameEn: "Wat Salakun",
     category: "temple",
     lat: 13.90642,
     lng: 100.48316,
@@ -154,6 +154,7 @@ export const PLACES: Place[] = [
   {
     id: "baan-rim-nam-home-cafe",
     name: "บ้านริมน้ำ โฮมคาเฟ่ เกาะเกร็ด",
+    nameEn: "Baan Rim Nam Home Café",
     category: "cafe",
     lat: 13.91135,
     lng: 100.49097,
@@ -288,13 +289,16 @@ export const PLACES: Place[] = [
     description: "ท่าเรือข้ามฟากทางใต้ของเกาะ ขึ้นทะเบียนเป็นสถานีขนส่งสาธารณะใน OpenStreetMap",
   },
   {
+    // OSM knows this only as an English-labelled `tourism=artwork` node. The Thai name and the English
+    // rendering below come from VRTwinS360's own Koh Kret map (entry 11), which is authoritative — so
+    // the `dataNote` this entry used to carry, explaining that no Thai name could be sourced, is gone
+    // rather than left standing after the gap it described was closed.
     id: "batik-fabric-house",
-    name: "Batik Fabric House",
+    name: "กลุ่มศิลปประดิษฐ์ ลัดดาบาติก และผ้ามัดย้อม",
+    nameEn: "Ladda Batik & Tie-Dye",
     category: "craft",
     lat: 13.9026215,
     lng: 100.4758822,
-    dataNote:
-      "OSM บันทึกไว้เป็น tourism=artwork มีแต่ชื่ออังกฤษ ไม่มีชื่อไทย เวลาเปิด หรือแหล่งอ้างอิงอื่น หลักฐานบางกว่าที่อื่นในชุดนี้",
   },
   // The two landings on the Pak Kret bank. Everyone arrives by ferry, and until now the map showed
   // only the piers on the island side — the half of the crossing you are not standing on yet.
