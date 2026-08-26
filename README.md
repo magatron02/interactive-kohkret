@@ -25,6 +25,11 @@ npm run dev
 
 `npm run setup` จะบอกเองถ้า Node เก่าเกิน พร้อมคำสั่งติดตั้งของ OS นั้นๆ และไม่แตะอะไรในเครื่องถ้ายังไม่พร้อม
 
+> **build ครั้งแรกต้องต่อเน็ต** — ฟอนต์ K2D กับ Baloo 2 ถูก self-host ผ่าน `next/font/google` ซึ่งดาวน์โหลด
+> ตอน build แล้ว cache ไว้ ถ้ารันใน sandbox ที่ออกเน็ตไม่ได้ Next จะ fallback ไปใช้ฟอนต์ระบบแทน — เว็บยังทำงานปกติ
+> แค่หน้าตาฟอนต์เพี้ยน ส่วนข้อมูลแผนที่ (`scripts/build-map-data.mjs`) rebuild แบบ offline ได้จริง เพราะ cache OSM
+> อยู่ใน repo แล้ว
+
 ```bash
 npm test        # 64 assertions — ข้อมูล เส้นทาง QR โลโก้ และการ rebuild (node:test ไม่ต้องลง framework)
 npm run typecheck # tsc (สร้าง route types ของ Next ให้ก่อน — บน clone ใหม่ tsc เปล่าๆ จะพัง)
