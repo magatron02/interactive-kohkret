@@ -386,15 +386,16 @@ body {
 }
 
 /* One per walked leg, at its midpoint, appearing the moment its leg is revealed. currentColor rides
-   the same route colour as the line it sits on. Filled rather than stroked so it stays crisp at 1.1
-   viewBox units — a stroke that thin would nearly disappear at 100% zoom. */
+   the same route colour as the line it sits on. An open chevron rather than a filled triangle — the
+   solid version read as a chunky arrowhead once zoomed in, especially over a cluster badge. */
 /* Only opacity animates here, never transform — the element's `transform` attribute is doing the
    real work of placing and rotating the arrow (set from route.arrows in MapCanvas), and a CSS
    animation touching `transform` on the same element would fight that positioning attribute. */
 .route-arrow {
-  fill: currentColor;
-  stroke: var(--color-bg-map);
-  stroke-width: 0.25;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.45;
+  stroke-linecap: round;
   stroke-linejoin: round;
   animation: arrow-in 220ms var(--ease-out-expo) both;
 }

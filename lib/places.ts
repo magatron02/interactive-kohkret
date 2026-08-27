@@ -13,8 +13,8 @@
 // description exists, `description` is omitted rather than invented — the UI renders that state honestly.
 // `hours` is only present when OSM or a source publishes it; temples are left blank because none do.
 //
-// Counts are therefore REAL counts of verified places (6 temples, 6 cafes, 5 restaurants, 4 homestays,
-// 3 craft workshops, 5 piers — 29 total), not the illustrative numbers printed on the reference poster.
+// Counts are therefore REAL counts of verified places (6 temples, 5 cafes, 1 restaurant, 4 homestays,
+// 3 craft workshops, 5 piers — 24 total), not the illustrative numbers printed on the reference poster.
 //
 // Data © OpenStreetMap contributors, ODbL 1.0.
 
@@ -284,14 +284,6 @@ export const PLACES: Place[] = [
     category: "pier",
     lat: 13.91367801567997,
     lng: 100.48591793612269,
-  },
-  {
-    id: "wat-bang-chak",
-    name: "วัดบางจาก",
-    nameEn: "Wat Bang Chak",
-    category: "temple",
-    lat: 13.917347678656077,
-    lng: 100.48549435417847,
   },
   {
     id: "craft-group",

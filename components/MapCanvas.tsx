@@ -323,7 +323,7 @@ export default function MapCanvas({
             {walkedArrows.map((a, i) => (
               <path
                 key={i}
-                d="M-1.1,-1.3 L1.1,0 L-1.1,1.3 Z"
+                d="M-1,-1.3 L1,0 L-1,1.3"
                 className="route-arrow"
                 style={{ animationDelay: `${i * 60}ms` }}
                 transform={`translate(${a.x},${a.y}) rotate(${a.angle})`}
@@ -344,7 +344,7 @@ export default function MapCanvas({
                 {routeArrows(r.path).map((a, j) => (
                   <path
                     key={j}
-                    d="M-1.1,-1.3 L1.1,0 L-1.1,1.3 Z"
+                    d="M-1,-1.3 L1,0 L-1,1.3"
                     className="route-arrow"
                     transform={`translate(${a.x},${a.y}) rotate(${a.angle})`}
                   />
