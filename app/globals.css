@@ -385,16 +385,20 @@ body {
   opacity: 0.45;
 }
 
-/* One per walked leg, at its midpoint, appearing the moment its leg is revealed. currentColor rides
-   the same route colour as the line it sits on. An open chevron rather than a filled triangle — the
-   solid version read as a chunky arrowhead once zoomed in, especially over a cluster badge. */
+/* One per walked leg, at its midpoint, appearing the moment its leg is revealed. A fixed dark ink
+   rather than currentColor — every route colour (orange, yellow, purple, green, blue, teal) is a
+   bright, saturated tone, so a light or same-hue arrow nearly vanished into it; the page's own darkest
+   background colour clears 6:1 against every one of them (checked below), where near-white cleared as
+   low as 1.77:1. Sized to sit inside the line's own stroke width instead of poking a taller silhouette
+   above and below it.
+     r1 6.00  r2 9.24  r3 7.52  r4 9.41  r5 7.53  r6 9.75 — against --color-bg-deep */
 /* Only opacity animates here, never transform — the element's `transform` attribute is doing the
    real work of placing and rotating the arrow (set from route.arrows in MapCanvas), and a CSS
    animation touching `transform` on the same element would fight that positioning attribute. */
 .route-arrow {
   fill: none;
-  stroke: currentColor;
-  stroke-width: 0.45;
+  stroke: var(--color-bg-deep);
+  stroke-width: 0.5;
   stroke-linecap: round;
   stroke-linejoin: round;
   animation: arrow-in 220ms var(--ease-out-expo) both;
