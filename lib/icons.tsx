@@ -25,7 +25,8 @@ export type IconName =
   | "globe"
   | "zoom-in"
   | "zoom-out"
-  | "expand";
+  | "expand"
+  | "tour-360";
 
 type IconDef = { viewBox: string; paths: string[] };
 
@@ -155,6 +156,18 @@ const ICONS: Record<IconName, IconDef> = {
       "M15 3 H21 V9",
       "M9 21 H3 V15",
       "M15 21 H21 V15",
+    ],
+  },
+  // A flattened horizon ellipse wrapping a small globe, with spin ticks at each end — the standard
+  // "360° panorama" mark, not a literal camera (which would collide with no other icon here, but reads
+  // as "take a photo" rather than "look around").
+  "tour-360": {
+    viewBox: "0 0 24 24",
+    paths: [
+      "M3.4 12 C3.4 9.5 7.3 7.5 12 7.5 C16.7 7.5 20.6 9.5 20.6 12 C20.6 14.5 16.7 16.5 12 16.5 C7.3 16.5 3.4 14.5 3.4 12 Z",
+      "M9.3 12 A2.7 2.7 0 0 1 14.7 12 A2.7 2.7 0 0 1 9.3 12",
+      "M4.4 9.8 L3.4 12 L5.2 12.9",
+      "M19.6 14.2 L20.6 12 L18.8 11.1",
     ],
   },
 };

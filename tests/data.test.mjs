@@ -76,6 +76,13 @@ test('every place has a name, a real category and a coordinate on Koh Kret', () 
   }
 });
 
+test('every tourUrl, where present, is a real Matterport show link', () => {
+  for (const p of PLACES) {
+    if (p.tourUrl === undefined) continue;
+    assert.match(p.tourUrl, /^https:\/\/my\.matterport\.com\/show\/\?m=\w+$/, `${p.id}'s tourUrl is not a Matterport show link`);
+  }
+});
+
 test('every place projects inside the map frame', () => {
   for (const p of PLACES) {
     const { x, y } = project(p.lat, p.lng);

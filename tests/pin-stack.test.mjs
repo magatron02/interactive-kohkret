@@ -9,16 +9,19 @@ import assert from 'node:assert/strict';
 
 import { PLACES, placesAtSameSpot, OVERLAP_METRES, metresBetween } from '../lib/places.ts';
 import { project as projectLatLng } from '../lib/geo.ts';
-import { frontPlaces } from '../lib/pin-stack.ts';
+import { frontPlaces, clusterOf } from '../lib/pin-stack.ts';
 
 /** Adapts MapCanvas's own call shape — project(p) => {y}, from a place's lat/lng — for the tests. */
 const project = (p) => projectLatLng(p.lat, p.lng);
 const front = (places) => frontPlaces(places, project, placesAtSameSpot);
 
 test('every real cluster in the live data collapses to exactly one rendered pin', () => {
+  // A cluster is the full connected component of the same-spot relation, not just direct pairwise
+  // neighbours — three places can chain (A near B, B near C, A far from C) without A and C ever being
+  // each other's neighbour, and the invariant this test checks is about the whole chain, not a pair.
   const rendered = new Set(front(PLACES).map((p) => p.id));
   for (const place of PLACES) {
-    const cluster = [place, ...placesAtSameSpot(place)];
+    const cluster = [place, ...clusterOf(place, PLACES, placesAtSameSpot)];
     const renderedInCluster = cluster.filter((p) => rendered.has(p.id));
     assert.equal(renderedInCluster.length, 1, `cluster around ${place.id} has ${renderedInCluster.length} rendered pins: ${renderedInCluster.map((p) => p.id).join(', ')}`);
   }
@@ -28,7 +31,7 @@ test('the one pin a cluster keeps is the one MapCanvas already draws on top', ()
   // MapCanvas z-orders by y (southernmost wins), independent of this filter. The two have to agree,
   // or the badge would end up on a pin that isn't the one actually painted in front.
   for (const place of PLACES) {
-    const cluster = [place, ...placesAtSameSpot(place)];
+    const cluster = [place, ...clusterOf(place, PLACES, placesAtSameSpot)];
     if (cluster.length === 1) continue;
     const kept = front(cluster);
     assert.equal(kept.length, 1, `cluster around ${place.id} did not resolve to one front pin`);

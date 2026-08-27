@@ -399,6 +399,21 @@ body {
   animation: arrow-in 220ms var(--ease-out-expo) both;
 }
 
+/* Ad-hoc A→B routes from the picker — not a themed itinerary, so no stop-by-stop reveal: both draw in
+   full immediately. The alternate is dashed so two overlapping legs still read as two distinct routes
+   rather than one thicker line. */
+.walk-route {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.3;
+}
+.walk-route--alt {
+  stroke-dasharray: 2.2 1.6;
+  opacity: 0.75;
+}
+
 /* ---------------------------------------------------------------- pins */
 
 /*
@@ -488,6 +503,22 @@ body {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+}
+
+/* Opposite corner from `.map-pin__count`, so a pin that both buries siblings and has a tour never
+   collides its two badges. */
+.map-pin__tour {
+  position: absolute;
+  top: -0.3rem;
+  left: -0.35rem;
+  display: grid;
+  width: 1.05rem;
+  height: 1.05rem;
+  place-items: center;
+  border: 1.5px solid var(--color-bg-map);
+  border-radius: 9999px;
+  background: var(--color-ink);
+  color: var(--color-bg-deep);
 }
 
 /*

@@ -11,6 +11,7 @@ const HERE = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z
 const DIR = process.argv[2] ?? path.join(HERE, 'osm-cache');
 const GEO_OUT = process.argv[3] ?? path.join(HERE, '..', 'lib', 'geo.ts');
 const ROUTES_OUT = process.argv[4] ?? path.join(HERE, '..', 'lib', 'route-paths.ts');
+const WALK_GRAPH_OUT = process.argv[5] ?? path.join(HERE, '..', 'lib', 'walk-graph.ts');
 const read = (f) => JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8'));
 
 const island = read('kohkret_osm.json')[0].geojson.coordinates[0];
@@ -184,13 +185,12 @@ const PLACES = SRC_PLACES.map((p) => [p.id, p.lat, p.lng]);
 const ROUTES = Object.fromEntries(SRC_ROUTES.map((r) => [r.id, r.stops.map((s) => s.placeId)]));
 
 /*
-  A place is routable only if a walkable OSM way actually comes near its door. 80 m is the ceiling:
-  17 of the 19 places snap within 40 m, and the two that do not are 240 m out — the west-tip
-  restaurants, one of which publishes "reached by boat" as its own directions. Snapping those to a
-  node a quarter of a kilometre away used to succeed silently, so the drawn line skipped them while
-  the route went on advertising a walking distance that covered them.
+  A place is routable only if a walkable OSM way actually comes near its door. This has to match
+  TOLERANCE_M in tests/routes.test.mjs — a stop the drawn line misses by more than the tolerance has
+  to be declared unreachable at generation time, not left to snap onto a distant node that satisfies
+  a looser limit here while the test's own proximity check catches it as a miss.
 */
-const SNAP_LIMIT_M = 80;
+const SNAP_LIMIT_M = 40;
 const snapped = new Map();
 const snapDistance = new Map();
 for (const [id, lat, lon] of PLACES) {
@@ -416,3 +416,51 @@ fs.writeFileSync(ROUTES_OUT, R.join('\n'));
 
 console.log(`\nwrote ${GEO_OUT} (${(fs.statSync(GEO_OUT).size / 1024).toFixed(1)} KB)`);
 console.log(`wrote ${ROUTES_OUT} (${(fs.statSync(ROUTES_OUT).size / 1024).toFixed(1)} KB)`);
+
+// ---- walk graph: the largest component only, shipped to the browser for on-demand A→B routing ----
+// (the fixed named ROUTES above are baked at build time; this is the same graph, kept live so any two
+// places can be routed between at runtime without a server.)
+const idxOf = new Map();
+const graphNodes = [];
+for (const [k, n] of nodes) {
+  if (compOf.get(k) !== biggest) continue;
+  idxOf.set(k, graphNodes.length);
+  graphNodes.push([+X(n.lon).toFixed(2), +Y(n.lat).toFixed(2)]);
+}
+const graphEdges = [];
+const seenEdge = new Set();
+for (const [k, n] of nodes) {
+  if (compOf.get(k) !== biggest) continue;
+  const a = idxOf.get(k);
+  for (const e of n.edges) {
+    const b = idxOf.get(e.to);
+    if (b === undefined) continue;
+    const edgeKey = a < b ? `${a}-${b}` : `${b}-${a}`;
+    if (seenEdge.has(edgeKey)) continue;
+    seenEdge.add(edgeKey);
+    graphEdges.push([a, b, +e.w.toFixed(1)]);
+  }
+}
+const W = [];
+W.push('// GENERATED from real OpenStreetMap data — do not hand-edit. Rebuild with scripts/build-map-data.mjs.');
+W.push('//');
+W.push('// The same walkable-ways graph the fixed named routes in ROUTE_GEOMETRY are solved over, kept');
+W.push('// here as plain node/edge data (in the shared MAP_VIEWBOX projection) so lib/walk-routing.ts can');
+W.push('// run Dijkstra client-side between any two places, not just the six itineraries baked at build');
+W.push('// time. Only the largest connected component ships — a node nothing on the island can walk to');
+W.push('// from anywhere else is not routable and would only bloat the bundle.');
+W.push('//');
+W.push('// Data © OpenStreetMap contributors, ODbL 1.0.');
+W.push('');
+W.push('/** [x, y] in MAP_VIEWBOX units. */');
+W.push('export const WALK_NODES: [number, number][] = [');
+for (const [x, y] of graphNodes) W.push(`  [${x},${y}],`);
+W.push('];');
+W.push('');
+W.push('/** [fromIndex, toIndex, metres] — undirected, each pair listed once. */');
+W.push('export const WALK_EDGES: [number, number, number][] = [');
+for (const [a, b, w] of graphEdges) W.push(`  [${a},${b},${w}],`);
+W.push('];');
+W.push('');
+fs.writeFileSync(WALK_GRAPH_OUT, W.join('\n'));
+console.log(`wrote ${WALK_GRAPH_OUT} (${(fs.statSync(WALK_GRAPH_OUT).size / 1024).toFixed(1)} KB) — ${graphNodes.length} nodes, ${graphEdges.length} edges`);

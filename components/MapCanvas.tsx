@@ -11,7 +11,8 @@ import {
 } from "@/lib/geo";
 import { ROUTE_GEOMETRY } from "@/lib/route-paths";
 import { getCategory, getPlace, placesAtSameSpot, type Place, type TourRoute } from "@/lib/places";
-import { frontPlaces } from "@/lib/pin-stack";
+import { clusterOf, frontPlaces } from "@/lib/pin-stack";
+import { routeArrows, type WalkRoute } from "@/lib/walk-routing";
 import { Icon } from "@/lib/icons";
 import { FRAME_TALL, FRAME_WIDE, clampFrame, zoomFrame, type Frame } from "@/lib/frame";
 
@@ -55,12 +56,16 @@ export default function MapCanvas({
   onSelectPlace,
   /** Distinguishes "nothing matched your filter" from "you have not filtered yet". */
   hasSelection,
+  /** Ad-hoc A→B routes from RoutePicker — null while a themed route is active, so the two never draw
+   *  on top of each other. */
+  walkRoutes,
 }: {
   visiblePlaces: Place[];
   activeRoute: TourRoute | null;
   selectedPlaceId: string | null;
   onSelectPlace: (id: string) => void;
   hasSelection: boolean;
+  walkRoutes?: WalkRoute[] | null;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const base = useBaseFrame(wrapRef);
@@ -326,6 +331,27 @@ export default function MapCanvas({
             ))}
           </g>
         )}
+
+        {/* Ad-hoc A→B routes from RoutePicker — drawn in full immediately, no stop-by-stop reveal,
+            since there is no itinerary order to walk through one tap at a time. */}
+        {!activeRoute &&
+          walkRoutes?.map((r, i) => {
+            const d = "M" + r.path.map(([x, y]) => `${x},${y}`).join("L");
+            const color = i === 0 ? "var(--color-route-4)" : "var(--color-ink-faint)";
+            return (
+              <g key={i} style={{ color }}>
+                <path d={d} className={`walk-route ${i > 0 ? "walk-route--alt" : ""}`} />
+                {routeArrows(r.path).map((a, j) => (
+                  <path
+                    key={j}
+                    d="M-1.1,-1.3 L1.1,0 L-1.1,1.3 Z"
+                    className="route-arrow"
+                    transform={`translate(${a.x},${a.y}) rotate(${a.angle})`}
+                  />
+                ))}
+              </g>
+            );
+          })}
       </svg>
 
       <div className="pointer-events-none absolute right-3 top-3 flex flex-col items-center gap-0.5 text-[var(--color-ink)] sm:right-5 sm:top-5">
@@ -385,7 +411,7 @@ export default function MapCanvas({
         const { x, y } = project(place.lat, place.lng);
         // Only the pin painted on top of a cluster carries the badge; z-order is by latitude, so the
         // southernmost of a group is the one in front.
-        const neighbours = placesAtSameSpot(place, shown);
+        const neighbours = clusterOf(place, shown, placesAtSameSpot);
         const buried = neighbours.filter((n) => project(n.lat, n.lng).y < y).length;
 
         return (
@@ -428,6 +454,11 @@ export default function MapCanvas({
             </span>
             {/* The pin on top of a stack says how many are under it, so nothing is silently buried. */}
             {buried > 0 && <span className="map-pin__count">+{buried}</span>}
+            {place.tourUrl && (
+              <span className="map-pin__tour" aria-hidden>
+                <Icon name="tour-360" className="h-2.5 w-2.5" strokeWidth={2} />
+              </span>
+            )}
             <span className="map-pin__stem" style={{ borderTopColor: color }} aria-hidden />
           </button>
         );

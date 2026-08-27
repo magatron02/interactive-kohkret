@@ -2,15 +2,21 @@
 
 import { useMemo, useState } from "react";
 import { PLACES, ROUTES, getCategory, getPlace, type Category } from "@/lib/places";
+import { project, PROJECTION } from "@/lib/geo";
+import { WALK_NODES, WALK_EDGES } from "@/lib/walk-graph";
+import { findRoutes } from "@/lib/walk-routing";
 import BrandLockup from "@/components/BrandLockup";
 import MapCanvas from "@/components/MapCanvas";
 import CategoryPanel from "@/components/CategoryPanel";
 import SearchBar from "@/components/SearchBar";
 import PlacePopup from "@/components/PlacePopup";
 import RouteLegend from "@/components/RouteLegend";
+import RoutePicker from "@/components/RoutePicker";
 import ItineraryTimeline from "@/components/ItineraryTimeline";
 import VirtualTourCard from "@/components/VirtualTourCard";
 import SiteFooter from "@/components/SiteFooter";
+
+const UNITS_PER_METRE = PROJECTION.sy / 111_320;
 
 export default function Home() {
   const [activeCategories, setActiveCategories] = useState<Set<Category>>(new Set());
@@ -18,9 +24,25 @@ export default function Home() {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [closingPlaceId, setClosingPlaceId] = useState<string | null>(null);
+  const [walkFromId, setWalkFromId] = useState(PLACES[0].id);
+  const [walkToId, setWalkToId] = useState(PLACES[1].id);
 
   const activeRoute = ROUTES.find((r) => r.id === selectedRouteId) ?? null;
   const selectedPlace = selectedPlaceId ? (getPlace(selectedPlaceId) ?? null) : null;
+
+  // Ad-hoc A→B walking directions, recomputed whenever either endpoint changes. null (not []) means
+  // "not on the walkable network" — RoutePicker tells the visitor that honestly instead of showing
+  // nothing with no explanation.
+  const walkRoutes = useMemo(() => {
+    if (walkFromId === walkToId) return null;
+    const from = getPlace(walkFromId);
+    const to = getPlace(walkToId);
+    if (!from || !to) return null;
+    const a = project(from.lat, from.lng);
+    const b = project(to.lat, to.lng);
+    const routes = findRoutes([a.x, a.y], [b.x, b.y], WALK_NODES, WALK_EDGES, UNITS_PER_METRE);
+    return routes.length ? routes : null;
+  }, [walkFromId, walkToId]);
 
   const visiblePlaces = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -99,6 +121,7 @@ export default function Home() {
               selectedPlaceId={selectedPlaceId}
               onSelectPlace={selectPlace}
               hasSelection={hasSelection}
+              walkRoutes={activeRoute ? null : walkRoutes}
             />
             {selectedPlace && (
               <PlacePopup
@@ -113,6 +136,16 @@ export default function Home() {
           {/* Sits directly under the map: picking a route is the next thing you do after looking at it. */}
           <div className="mt-4 border-t border-[var(--color-hairline)] pt-3.5">
             <RouteLegend activeRouteId={selectedRouteId} onSelect={setSelectedRouteId} />
+          </div>
+
+          <div className="mt-3">
+            <RoutePicker
+              fromId={walkFromId}
+              toId={walkToId}
+              onChangeFrom={setWalkFromId}
+              onChangeTo={setWalkToId}
+              routes={walkRoutes}
+            />
           </div>
 
           <ItineraryTimeline route={activeRoute} onSelectPlace={selectPlace} />
