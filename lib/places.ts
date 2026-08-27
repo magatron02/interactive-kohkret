@@ -13,8 +13,8 @@
 // description exists, `description` is omitted rather than invented — the UI renders that state honestly.
 // `hours` is only present when OSM or a source publishes it; temples are left blank because none do.
 //
-// Counts are therefore REAL counts of verified places (6 temples, 3 cafes, 3 restaurants, 1 homestay,
-// 1 craft workshop, 2 piers), not the illustrative numbers printed on the reference poster.
+// Counts are therefore REAL counts of verified places (6 temples, 6 cafes, 5 restaurants, 4 homestays,
+// 3 craft workshops, 5 piers — 29 total), not the illustrative numbers printed on the reference poster.
 //
 // Data © OpenStreetMap contributors, ODbL 1.0.
 
@@ -321,6 +321,65 @@ export const PLACES: Place[] = [
     lng: 100.4915896,
     mainland: true,
     description: "ท่าเรือข้ามฟากฝั่งปากเกร็ดทางใต้ ข้ามไปขึ้นที่ท่าเรือป่าฝ้าย",
+  },
+  // Seven places from VRTwinS360's own Koh Kret map that OSM does not carry. Coordinates for the last
+  // two were corrected by the user after this project's own polygon check flagged the first-supplied
+  // values (one 389 m off the island, one identical to tong-homestay's) — these are the confirmed ones.
+  {
+    id: "tha-wat-bang-chak",
+    name: "ท่าเรือวัดบางจาก",
+    nameEn: "Wat Bang Chak Pier",
+    category: "pier",
+    lat: 13.91356,
+    lng: 100.48581,
+  },
+  {
+    id: "craft-group",
+    name: "กลุ่มหัตถกรรมเครื่องปั้นดินเผา",
+    nameEn: "Pottery Craft Group",
+    category: "craft",
+    lat: 13.90756,
+    lng: 100.48906,
+  },
+  {
+    id: "tong-homestay",
+    name: "โต๊งโฮมสเตย์",
+    nameEn: "Tong Homestay",
+    category: "homestay",
+    lat: 13.90769,
+    lng: 100.48181,
+  },
+  {
+    id: "cast-away-homestay",
+    name: "Cast Away Homestay",
+    category: "homestay",
+    lat: 13.912,
+    lng: 100.482,
+    dataNote: "พิกัดโดยประมาณ",
+  },
+  {
+    id: "lop-krung-homestay",
+    name: "หลบกรุงโฮมสเตย์",
+    nameEn: "Lop Krung Homestay",
+    category: "homestay",
+    lat: 13.917633060946086,
+    lng: 100.47011862449344,
+  },
+  {
+    id: "wayde",
+    name: "WAYDE",
+    category: "cafe",
+    lat: 13.902279106787306,
+    lng: 100.48907128216547,
+  },
+  {
+    id: "baan-lek-thi-1",
+    name: "กาแฟบ้านเลขที่ ๑",
+    nameEn: "Baan Lek Thi 1 Coffee",
+    category: "cafe",
+    lat: 13.909,
+    lng: 100.488,
+    dataNote: "พิกัดโดยประมาณ",
   },
 ];
 

@@ -281,9 +281,9 @@ Two things that module now guarantees, both of which were bugs:
 
 - **360° tour** does not exist; the QR resolves to the real อบต.เกาะเกร็ด site rather than promising one.
 - **AI guide** was cut by the user (needs a backend and ongoing API cost).
-- **กาแฟบ้านเลขที่ ๑** and similar are absent because their only published address is "1 หมู่ 1", which
-  will not geocode. Adding them with an estimated position would break rule 1.
-- **6 of 22 places have no description** — no sourceable text found. The empty state is deliberate.
+- **7 places from the VRTwinS360 poster** were added with coordinates the user supplied and personally
+  confirmed — two (Cast Away Homestay, กาแฟบ้านเลขที่ ๑) are approximate and carry a `dataNote` saying so.
+- **13 of 29 places have no description** — no sourceable text found. The empty state is deliberate.
 - **6 routes, not the poster's 8.** The missing two need place types the island does not have enough of.
 - **The day trip still retraces 20% of its walk.** That is the island — a spine with dead-end lanes down
   to each temple — not the solver. It was 35% before the order was optimised.
