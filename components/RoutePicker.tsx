@@ -1,6 +1,7 @@
-import { PLACES, getPlace } from "@/lib/places";
+import { getPlace } from "@/lib/places";
 import { formatDistance } from "@/lib/route-paths";
 import { estimateMinutes, type WalkRoute } from "@/lib/walk-routing";
+import PlaceSelect from "@/components/PlaceSelect";
 
 /**
  * Any two places, not just the six themed itineraries in RouteLegend — for "how do I get from the
@@ -21,7 +22,6 @@ export default function RoutePicker({
   onChangeTo: (id: string) => void;
   routes: WalkRoute[] | null;
 }) {
-  const sorted = [...PLACES].sort((a, b) => a.name.localeCompare(b.name, "th"));
   const same = fromId === toId;
 
   return (
@@ -34,33 +34,11 @@ export default function RoutePicker({
       </h2>
 
       <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
-        <select
-          value={fromId}
-          onChange={(e) => onChangeFrom(e.target.value)}
-          aria-label="จาก"
-          className="min-h-11 flex-1 rounded-lg border border-[var(--color-hairline)] bg-[var(--color-bg-panel)] px-2 text-sm text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-        >
-          {sorted.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+        <PlaceSelect value={fromId} onChange={onChangeFrom} label="จาก" />
         <span className="hidden text-[var(--color-ink-faint)] sm:inline" aria-hidden>
           →
         </span>
-        <select
-          value={toId}
-          onChange={(e) => onChangeTo(e.target.value)}
-          aria-label="ไป"
-          className="min-h-11 flex-1 rounded-lg border border-[var(--color-hairline)] bg-[var(--color-bg-panel)] px-2 text-sm text-[var(--color-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-        >
-          {sorted.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+        <PlaceSelect value={toId} onChange={onChangeTo} label="ไป" />
       </div>
 
       {same ? (

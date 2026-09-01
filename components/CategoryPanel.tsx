@@ -5,15 +5,19 @@ export default function CategoryPanel({
   active,
   onToggle,
   onClear,
+  onShowAll,
 }: {
   active: Set<Category>;
   onToggle: (id: Category) => void;
   onClear: () => void;
+  onShowAll: () => void;
 }) {
+  // One button, two jobs: nothing selected means the map is showing nothing, so the useful action is
+  // "show every category" — anything selected means the useful action is "clear back to nothing". The
+  // label always names what tapping it does, not a fixed caption that stopped matching the handler.
+  const hasSelection = active.size > 0;
   return (
     <section aria-labelledby="categories-heading" className="panel-surface">
-      {/* The clear button is always in the layout and only its visibility changes. Mounting it on
-          selection shifted this whole column down by its own height every time a chip was tapped. */}
       <div className="flex min-h-9 items-center justify-between gap-3">
         <h2
           id="categories-heading"
@@ -23,14 +27,10 @@ export default function CategoryPanel({
         </h2>
         <button
           type="button"
-          onClick={onClear}
-          aria-hidden={active.size === 0}
-          tabIndex={active.size === 0 ? -1 : undefined}
-          className={`-mr-2 inline-flex min-h-9 items-center rounded px-2 text-xs text-[var(--color-ink-muted)] underline-offset-2 transition-colors duration-150 hover:text-[var(--color-ink)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-panel)] ${
-            active.size === 0 ? "pointer-events-none invisible" : ""
-          }`}
+          onClick={hasSelection ? onClear : onShowAll}
+          className="-mr-2 inline-flex min-h-9 items-center rounded px-2 text-xs text-[var(--color-ink-muted)] underline-offset-2 transition-colors duration-150 hover:text-[var(--color-ink)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-panel)]"
         >
-          แสดงทั้งหมด
+          {hasSelection ? "ล้างทั้งหมด" : "แสดงทั้งหมด"}
         </button>
       </div>
 

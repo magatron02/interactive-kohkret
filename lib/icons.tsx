@@ -102,12 +102,17 @@ const ICONS: Record<IconName, IconDef> = {
       "M2 20 C4.7 18.7 7.3 21.3 10 20 C12.7 18.7 15.3 21.3 18 20 C19.3 19.4 20.7 19.7 22 20.4",
     ],
   },
+  // A needle, not a symmetric rose — the old four-point star pointed nowhere, so the "N" caption under
+  // it was doing all the work. This actually points: a long arrowhead lobe at the top of the ring, a
+  // short tail at the bottom, the way a real compass needle reads at a glance. The map itself never
+  // rotates (see lib/geo.ts's project() — latitude maps straight to -y), so "up" is true north exactly,
+  // and a needle fixed pointing up is correct by construction rather than something to keep in sync.
   compass: {
     viewBox: "0 0 24 24",
     paths: [
       "M20.6 12 A8.6 8.6 0 0 1 3.4 12 A8.6 8.6 0 0 1 20.6 12",
-      "M12 2.2 L13.7 10.3 L20.1 12 L13.7 13.7 L12 19.6 L10.3 13.7 L3.9 12 L10.3 10.3 Z",
-      "M16.5 7.5 L17.7 6.3 M6.3 6.3 L7.5 7.5 M16.5 16.5 L17.7 17.7 M6.3 17.7 L7.5 16.5",
+      "M12 4 L14.6 12.4 L12 11 L9.4 12.4 Z",
+      "M12 20 L12 13.2",
     ],
   },
   search: {

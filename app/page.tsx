@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PLACES, ROUTES, getCategory, getPlace, type Category } from "@/lib/places";
+import { CATEGORIES, PLACES, ROUTES, getCategory, getPlace, type Category } from "@/lib/places";
 import { project, PROJECTION } from "@/lib/geo";
 import { WALK_NODES, WALK_EDGES } from "@/lib/walk-graph";
 import { findRoutes } from "@/lib/walk-routing";
@@ -71,6 +71,10 @@ export default function Home() {
     });
   }
 
+  function showAllCategories() {
+    setActiveCategories(new Set(CATEGORIES.map((c) => c.id)));
+  }
+
   function closePopup() {
     if (!selectedPlaceId) return;
     const closing = selectedPlaceId;
@@ -110,6 +114,7 @@ export default function Home() {
             active={activeCategories}
             onToggle={toggleCategory}
             onClear={() => setActiveCategories(new Set())}
+            onShowAll={showAllCategories}
           />
         </div>
 
