@@ -60,7 +60,7 @@ export default function PlaceSelect({
         <ul
           role="listbox"
           aria-label={label}
-          className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-[var(--color-hairline)] bg-[var(--color-bg-elevated)] py-1 shadow-[0_12px_32px_rgba(0,0,0,0.45)]"
+          className="scroll-y absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-[var(--color-hairline)] bg-[var(--color-bg-elevated)] py-1 shadow-[0_12px_32px_rgba(0,0,0,0.45)]"
         >
           {sorted.map((p) => {
             const isSelected = p.id === value;

@@ -273,6 +273,26 @@ body {
   background: var(--color-ink-faint);
 }
 
+/* Vertical counterpart — the place popup and the route-picker dropdown both scroll their own content
+   inside a dark card, and the OS default scrollbar (light, opaque) read as a UI glitch against it. */
+.scroll-y {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-faint) transparent;
+}
+.scroll-y::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-y::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-y::-webkit-scrollbar-thumb {
+  background: var(--color-hairline);
+  border-radius: 9999px;
+}
+.scroll-y::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-faint);
+}
+
 /* ---------------------------------------------------------------- map layers */
 
 /* Pak Kret on both banks. The river is painted over this, so land is the ground plane. */

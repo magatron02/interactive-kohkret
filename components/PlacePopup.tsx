@@ -26,7 +26,7 @@ export default function PlacePopup({
       // The card is a sibling of the map, not a child, so the map's own `overflow-hidden` does not clip
       // it: unbounded, it ran 90px past the top edge and over the site header. Capped to the frame with
       // its own scroll instead.
-      className={`absolute left-3 bottom-3 z-30 w-[min(280px,calc(100%-1.5rem))] max-h-[calc(100%-1.5rem)] overflow-y-auto overscroll-contain rounded-xl border border-[var(--color-hairline)] bg-[var(--color-bg-elevated)] p-3 shadow-[0_12px_32px_rgba(0,0,0,0.45)] sm:left-4 sm:bottom-4 sm:max-h-[calc(100%-2rem)] sm:w-[272px] ${
+      className={`scroll-y absolute left-3 bottom-3 z-30 w-[min(280px,calc(100%-1.5rem))] max-h-[calc(100%-1.5rem)] overflow-y-auto overscroll-contain rounded-xl border border-[var(--color-hairline)] bg-[var(--color-bg-elevated)] p-3 shadow-[0_12px_32px_rgba(0,0,0,0.45)] sm:left-4 sm:bottom-4 sm:max-h-[calc(100%-2rem)] sm:w-[272px] ${
         closing ? "popup-exit pointer-events-none" : "popup-enter"
       }`}
     >
