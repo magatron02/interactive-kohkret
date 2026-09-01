@@ -317,17 +317,19 @@ export default function MapCanvas({
               pathLength={1}
               style={{ strokeDashoffset: 1 - progress }}
             />
-            {/* One chevron per walked leg, at its midpoint, pointing the way you actually walk it. Only
-                the legs already revealed get one, so an arrow never points at ground you have not
+            {/* One badge per walked leg, at its midpoint, pointing the way you actually walk it. Only
+                the legs already revealed get one, so a badge never points at ground you have not
                 reached yet on the line — it appears the moment its leg is drawn. */}
             {walkedArrows.map((a, i) => (
-              <path
+              <g
                 key={i}
-                d="M-0.32,-0.34 L0.32,0 L-0.32,0.34"
-                className="route-arrow"
+                className="route-arrow-badge"
                 style={{ animationDelay: `${i * 60}ms` }}
                 transform={`translate(${a.x},${a.y}) rotate(${a.angle})`}
-              />
+              >
+                <circle className="route-arrow-badge__bg" r="0.95" />
+                <path className="route-arrow-badge__mark" d="M-0.32,-0.36 L0.32,0 L-0.32,0.36" />
+              </g>
             ))}
           </g>
         )}
@@ -342,12 +344,10 @@ export default function MapCanvas({
               <g key={i} style={{ color }}>
                 <path d={d} className={`walk-route ${i > 0 ? "walk-route--alt" : ""}`} />
                 {routeArrows(r.path).map((a, j) => (
-                  <path
-                    key={j}
-                    d="M-0.32,-0.34 L0.32,0 L-0.32,0.34"
-                    className="route-arrow"
-                    transform={`translate(${a.x},${a.y}) rotate(${a.angle})`}
-                  />
+                  <g key={j} className="route-arrow-badge" transform={`translate(${a.x},${a.y}) rotate(${a.angle})`}>
+                    <circle className="route-arrow-badge__bg" r="0.95" />
+                    <path className="route-arrow-badge__mark" d="M-0.32,-0.36 L0.32,0 L-0.32,0.36" />
+                  </g>
                 ))}
               </g>
             );

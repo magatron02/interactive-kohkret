@@ -361,12 +361,15 @@ body {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-/* The unwalked preview of the whole route — always the full path, never dashed, so its shape reads
-   before a single stop has been tapped. Sits under the core/glow pair, which draw over it as progress
-   advances. */
+/* The unwalked preview of the whole route — always the full path, so its shape reads before a single
+   stop has been tapped. Dotted (round dashes at a fixed real-length spacing, not pathLength-normalised,
+   so the dot size stays consistent whether the route is 600 m or 5 km) rather than a solid faint line —
+   quieter, and it reads as "not yet walked" the way a dashed line does in most nav apps. Sits under the
+   core/glow pair, which draw solid over it as progress advances. */
 .route-line--ghost {
-  stroke-width: 0.7;
-  opacity: 0.22;
+  stroke-width: 0.55;
+  stroke-dasharray: 0.05 2.1;
+  opacity: 0.55;
 }
 /* pathLength=1 (set on the element in MapCanvas) makes `1` mean "the whole line" regardless of its
    real length, so `strokeDashoffset` from JS is a plain 0..1 walked fraction. The reveal itself is a
@@ -385,37 +388,43 @@ body {
   opacity: 0.45;
 }
 
-/* One per walked leg, at its midpoint, appearing the moment its leg is revealed. A fixed dark ink
-   rather than currentColor — every route colour (orange, yellow, purple, green, blue, teal) is a
-   bright, saturated tone, so a light or same-hue arrow nearly vanished into it; the page's own darkest
-   background colour clears 6:1 against every one of them (checked below), where near-white cleared as
-   low as 1.77:1. Sized to sit inside the line's own stroke width instead of poking a taller silhouette
-   above and below it.
-     r1 6.00  r2 9.24  r3 7.52  r4 9.41  r5 7.53  r6 9.75 — against --color-bg-deep */
+/* One per walked leg, at its midpoint, appearing the moment its leg is revealed — a small badge, not
+   just a mark riding the line: a fixed dark disc (so it reads against every route colour, including
+   the brightest ones, rather than trying to contrast against a hue that changes per route) ringed in
+   the route's own currentColor, with a light chevron inside pointing the walked direction. Sized
+   larger than the line's own stroke width on purpose — a badge sitting ON the line, the way a position
+   puck does in a turn-by-turn app, not a mark trying to hide inside it. */
 /* Only opacity animates here, never transform — the element's `transform` attribute is doing the
-   real work of placing and rotating the arrow (set from route.arrows in MapCanvas), and a CSS
+   real work of placing and rotating the badge (set from route.arrows in MapCanvas), and a CSS
    animation touching `transform` on the same element would fight that positioning attribute. */
-.route-arrow {
+.route-arrow-badge {
+  animation: arrow-in 220ms var(--ease-out-expo) both;
+}
+.route-arrow-badge__bg {
+  fill: var(--color-bg-deep);
+  stroke: currentColor;
+  stroke-width: 0.22;
+}
+.route-arrow-badge__mark {
   fill: none;
-  stroke: var(--color-bg-deep);
-  stroke-width: 0.32;
+  stroke: var(--color-ink);
+  stroke-width: 0.26;
   stroke-linecap: round;
   stroke-linejoin: round;
-  animation: arrow-in 220ms var(--ease-out-expo) both;
 }
 
 /* Ad-hoc A→B routes from the picker — not a themed itinerary, so no stop-by-stop reveal: both draw in
-   full immediately. The alternate is dashed so two overlapping legs still read as two distinct routes
-   rather than one thicker line. */
+   full immediately. Dotted like route-line--ghost, at a slightly wider spacing so the alternate still
+   reads as a second, distinct route where the two overlap rather than one thicker line. */
 .walk-route {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 0.8;
+  stroke-dasharray: 0.05 2.1;
+  stroke-width: 0.7;
 }
 .walk-route--alt {
-  stroke-dasharray: 2.2 1.6;
+  stroke-dasharray: 0.05 3.2;
   opacity: 0.75;
 }
 
@@ -680,13 +689,13 @@ body {
 */
 @media (prefers-reduced-motion: reduce) {
   .island-edge,
-  .route-arrow,
+  .route-arrow-badge,
   .map-pin,
   .stagger-in,
   .popup-enter {
     animation: none;
   }
-  .route-arrow {
+  .route-arrow-badge {
     opacity: 0.95;
   }
   .map-pin {
