@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CATEGORIES, PLACES, ROUTES, getCategory, getPlace, type Category } from "@/lib/places";
+import { CATEGORIES, PLACES, ROUTES, getCategory, getPlace, type Category, type Place } from "@/lib/places";
 import { project, PROJECTION } from "@/lib/geo";
 import { WALK_NODES, WALK_EDGES } from "@/lib/walk-graph";
 import { findRoutes } from "@/lib/walk-routing";
+import { bestScore } from "@/lib/search";
 import BrandLockup from "@/components/BrandLockup";
 import MapCanvas from "@/components/MapCanvas";
 import CategoryPanel from "@/components/CategoryPanel";
@@ -45,21 +46,24 @@ export default function Home() {
   }, [walkFromId, walkToId]);
 
   const visiblePlaces = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    return PLACES.filter((p) => {
+    const query = searchQuery.trim();
+    const scored = PLACES.map((p) => {
       const matchesCategory = activeCategories.size === 0 || activeCategories.has(p.category);
+      if (!matchesCategory) return null;
+      if (!query) return { place: p, score: 0 };
       // Category labels are searchable because they are the words a visitor actually types. The panel
       // beside this box prints "ร้านกาแฟ"; typing it and getting nothing back reads as a broken search,
-      // not as a hint to go and click the chip instead.
+      // not as a hint to go and click the chip instead. Fuzzy so a missing tone mark or a typo still
+      // finds the place — see lib/search.ts for why an exact match always outranks a near one.
       const category = getCategory(p.category);
-      const matchesSearch =
-        !query ||
-        p.name.toLowerCase().includes(query) ||
-        (p.nameEn?.toLowerCase().includes(query) ?? false) ||
-        category.label.toLowerCase().includes(query) ||
-        category.labelEn.toLowerCase().includes(query);
-      return matchesCategory && matchesSearch;
-    });
+      const score = bestScore(query, [p.name, p.nameEn, category.label, category.labelEn]);
+      return score === null ? null : { place: p, score };
+    }).filter((x): x is { place: Place; score: number } => x !== null);
+    // Ranked so the closest match leads — meaningless when nothing is typed (every score is 0), but a
+    // fuzzy search without ranking would surface a three-typo near-miss ahead of the exact place someone
+    // actually meant, in whatever order PLACES happens to list them.
+    scored.sort((a, b) => b.score - a.score);
+    return scored.map((x) => x.place);
   }, [activeCategories, searchQuery]);
 
   function toggleCategory(id: Category) {
